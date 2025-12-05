@@ -1,0 +1,21 @@
+{
+  "wallet": {
+    "balances": {
+      "USD": 15000,
+      "KES": 0
+    },
+    "activity": [
+      {
+        "id": "1764919930175-b2cad28ec1ef38",
+        "type": "deposit",
+        "amount": 10000,
+        "currency": "USD",
+        "description": "client deposit via client-topup",
+        "timestamp": "2025-12-05T07:32:10.175Z"
+      }
+    ]
+  },
+  "escrows": [],
+  "history": [],
+  "notifications": []
+}
