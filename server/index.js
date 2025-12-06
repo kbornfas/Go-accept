@@ -26,6 +26,18 @@ import {
   loginQueries,
   verificationQueries
 } from './database.js';
+import {
+  sendEscrowCreatedEmail,
+  sendPaymentReceivedEmail,
+  sendFundsReleasedEmail,
+  sendEscrowCancelledEmail
+} from './emailService.js';
+import {
+  logAuthEvent,
+  logEscrowEvent,
+  logWalletEvent,
+  logPasswordEvent
+} from './auditLog.js';
 
 // Optional profiling integration (may fail on some platforms)
 let nodeProfilingIntegration;
@@ -258,13 +270,18 @@ app.post('/api/auth/login',
   async (req, res) => {
   const { role, password } = req.body;
   if (!role || !password) {
+    await logAuthEvent(req, 'login_failed', role, null, false, { reason: 'missing_credentials' });
     return res.status(400).json({ message: 'role and password are required' });
   }
   const normalizedRole = role === 'admin' ? 'admin' : 'client';
   const expectedPassword = normalizedRole === 'admin' ? ADMIN_PASSWORD : CLIENT_PASSWORD;
   if (password !== expectedPassword) {
+    await logAuthEvent(req, 'login_failed', normalizedRole, null, false, { reason: 'invalid_password' });
     return res.status(401).json({ message: 'Invalid credentials' });
   }
+  
+  await logAuthEvent(req, 'login_success', normalizedRole, normalizedRole, true);
+  
   const token = signToken({ role: normalizedRole });
   return res.json({ token, role: normalizedRole });
 });
@@ -298,6 +315,14 @@ app.post('/api/wallet/deposit',
     timestamp: new Date().toISOString()
   };
   recordActivity(activityEntry);
+  
+  await logWalletEvent(req, 'wallet_deposit', req.user.role, req.user.role, {
+    amount: numericAmount,
+    currency: code,
+    source,
+    newBalance: db.wallet.balances[code]
+  });
+  
   await saveDb();
   return res.json({ wallet: db.wallet, activity: activityEntry });
 });
@@ -323,6 +348,15 @@ app.post('/api/wallet/transfer', authenticate(['admin']), async (req, res) => {
     timestamp: new Date().toISOString()
   };
   recordActivity(activityEntry);
+  
+  await logWalletEvent(req, 'wallet_transfer', req.user.role, req.user.role, {
+    amount: numericAmount,
+    currency: code,
+    destination,
+    memo,
+    newBalance: db.wallet.balances[code]
+  });
+  
   await saveDb();
   return res.json({ wallet: db.wallet, activity: activityEntry });
 });
@@ -421,6 +455,27 @@ app.post('/api/escrows',
     status: 'held',
     message: `New escrow created for ${platform}`
   });
+  
+  // Log audit event
+  await logEscrowEvent(req, 'escrow_created', escrowId, req.user.role, 'client', {
+    platform,
+    amount: numericAmount,
+    currency: code,
+    paymentMethods,
+    notes: notes || ''
+  });
+  
+  // Send email notification
+  const paymentLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/buyer-login?escrow=${escrowId}`;
+  await sendEscrowCreatedEmail({
+    clientEmail: req.user.email || 'client@example.com',
+    amount: numericAmount,
+    currency: code,
+    platform,
+    paymentLink,
+    escrowId
+  });
+  
   await saveDb();
   return res.status(201).json(newEscrow);
 });
@@ -465,6 +520,8 @@ app.patch('/api/escrows/:id', authenticate(['admin']), async (req, res) => {
   if (hold.status === status) {
     return res.json(hold);
   }
+  
+  const oldStatus = hold.status;
   hold.status = status;
   hold.statusHistory.unshift({
     status,
@@ -505,6 +562,48 @@ app.patch('/api/escrows/:id', authenticate(['admin']), async (req, res) => {
     status,
     message: `Escrow ${hold.id} marked as ${status}`
   });
+  
+  // Log audit event
+  await logEscrowEvent(req, `escrow_${status}`, hold.id, req.user.role, 'admin', {
+    oldStatus,
+    newStatus: status,
+    amount: hold.amount,
+    currency: hold.currency,
+    platform: hold.platform,
+    note: note || ''
+  });
+  
+  // Send email notifications
+  const clientEmail = req.user.email || 'client@example.com';
+  
+  if (status === 'approved') {
+    await sendPaymentReceivedEmail({
+      clientEmail,
+      amount: hold.amount,
+      currency: hold.currency,
+      platform: hold.platform,
+      escrowId: hold.id,
+      buyerEmail: 'buyer@example.com'
+    });
+  } else if (status === 'released') {
+    await sendFundsReleasedEmail({
+      clientEmail,
+      amount: hold.amount,
+      currency: hold.currency,
+      platform: hold.platform,
+      escrowId: hold.id
+    });
+  } else if (status === 'cancelled' || status === 'refunded') {
+    await sendEscrowCancelledEmail({
+      clientEmail,
+      amount: hold.amount,
+      currency: hold.currency,
+      platform: hold.platform,
+      escrowId: hold.id,
+      reason: note || status
+    });
+  }
+  
   await saveDb();
   return res.json(hold);
 });
@@ -945,6 +1044,9 @@ app.post('/api/auth/reset-password',
       });
       
       await saveDb();
+      
+      // Log audit event
+      await logPasswordEvent(req, 'password_reset_success', decoded.email, decoded.role, true);
       
       // Send confirmation email
       if (emailTransporter) {

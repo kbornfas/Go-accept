@@ -1,9 +1,22 @@
-import { useState, useEffect, useCallback } from 'react'
-import P2PPaymentCoordinator from './components/P2PPaymentCoordinator'
-import AdminEscrowDashboard from './components/AdminEscrowDashboard'
-import ClientLogin from './components/ClientLogin'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
+import { Loader2 } from 'lucide-react'
 import PlatformSelector from './components/PlatformSelector'
 import { useAuth } from './context/AuthContext.jsx'
+
+// Lazy load heavy components for code splitting
+const P2PPaymentCoordinator = lazy(() => import('./components/P2PPaymentCoordinator'))
+const AdminEscrowDashboard = lazy(() => import('./components/AdminEscrowDashboard'))
+const ClientLogin = lazy(() => import('./components/ClientLogin'))
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+    <div className="text-center">
+      <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
+      <p className="text-slate-300 text-lg">Loading...</p>
+    </div>
+  </div>
+)
 
 const getViewFromPath = (path) => {
   if (path.startsWith('/admin')) return 'admin'
@@ -79,25 +92,27 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900">
-      {view === 'admin' ? (
-        <AdminEscrowDashboard onNavigateClient={(nextView = 'client') => navigate(nextView)} />
-      ) : view === 'client' ? (
-        <P2PPaymentCoordinator 
-          initialPlatform={selectedPlatform} 
-          onChangePlatform={handleBackToPlatforms}
-        />
-      ) : view === 'client-login' ? (
-        <ClientLogin 
-          onSuccess={handleLoginSuccess} 
-          onNavigateAdmin={navigate}
-          onBack={handleBackToPlatforms}
-          selectedPlatform={selectedPlatform}
-        />
-      ) : (
-        <PlatformSelector 
-          onSelect={handlePlatformSelect}
-        />
-      )}
+      <Suspense fallback={<LoadingFallback />}>
+        {view === 'admin' ? (
+          <AdminEscrowDashboard onNavigateClient={(nextView = 'client') => navigate(nextView)} />
+        ) : view === 'client' ? (
+          <P2PPaymentCoordinator 
+            initialPlatform={selectedPlatform} 
+            onChangePlatform={handleBackToPlatforms}
+          />
+        ) : view === 'client-login' ? (
+          <ClientLogin 
+            onSuccess={handleLoginSuccess} 
+            onNavigateAdmin={navigate}
+            onBack={handleBackToPlatforms}
+            selectedPlatform={selectedPlatform}
+          />
+        ) : (
+          <PlatformSelector 
+            onSelect={handlePlatformSelect}
+          />
+        )}
+      </Suspense>
     </div>
   )
 }
