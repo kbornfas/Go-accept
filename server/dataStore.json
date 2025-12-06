@@ -1,10 +1,18 @@
 {
   "wallet": {
     "balances": {
-      "USD": 11650,
+      "USD": 10650,
       "KES": 0
     },
     "activity": [
+      {
+        "id": "1765045486505-9f05583347d7b8",
+        "type": "hold",
+        "amount": 1000,
+        "currency": "USD",
+        "description": "Hold created for binance",
+        "timestamp": "2025-12-06T18:24:46.505Z"
+      },
       {
         "id": "1765043801155-f9aa4b9f80365",
         "type": "hold",
@@ -82,6 +90,40 @@
   },
   "escrows": [
     {
+      "id": "miumidnt-q4cja7",
+      "platform": "binance",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "paypal",
+          "fields": {
+            "email": "kbonface03@gmail.com"
+          }
+        }
+      ],
+      "amount": 1000,
+      "currency": "USD",
+      "notes": "",
+      "status": "approved",
+      "expiresAt": "2025-12-06T18:39:46.494Z",
+      "createdAt": "2025-12-06T18:24:46.495Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQ1NDY2LCJleHAiOjE3NjUwNzQyNjZ9.gq8RrH_lUNwieuXGK0UFe2yibj7AqezGU0Dgy5E4J9g",
+      "statusHistory": [
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:29:33.564Z",
+          "note": ""
+        },
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-06T18:24:46.505Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
+    {
       "id": "miuli98j-acj6lb",
       "platform": "bybit",
       "paymentMethods": [
@@ -96,11 +138,17 @@
       "amount": 1000,
       "currency": "USD",
       "notes": "",
-      "status": "held",
+      "status": "approved",
       "expiresAt": "2025-12-06T18:11:41.142Z",
       "createdAt": "2025-12-06T17:56:41.143Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQzNzUyLCJleHAiOjE3NjUwNzI1NTJ9.A_iKwDAXp9EdL4ZZIihx25Y1w16-OeT9iH_RzKyerjk",
       "statusHistory": [
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:29:34.306Z",
+          "note": ""
+        },
         {
           "status": "held",
           "actor": "client",
@@ -126,11 +174,17 @@
       "amount": 20000,
       "currency": "KES",
       "notes": "",
-      "status": "held",
+      "status": "approved",
       "expiresAt": "2025-12-06T17:50:37.748Z",
       "createdAt": "2025-12-06T17:35:37.749Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQyNDczLCJleHAiOjE3NjUwNzEyNzN9.lKm8_EG20MG2Fh9C6gRCSxjQ4xHm4gMUrQP1UVfoXe0",
       "statusHistory": [
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:29:35.029Z",
+          "note": ""
+        },
         {
           "status": "held",
           "actor": "client",
@@ -156,11 +210,17 @@
       "amount": 100,
       "currency": "KES",
       "notes": "",
-      "status": "held",
+      "status": "approved",
       "expiresAt": "2025-12-06T17:43:21.781Z",
       "createdAt": "2025-12-06T17:28:21.781Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQyMDYxLCJleHAiOjE3NjUwNzA4NjF9.-5aecRxclDNTBdb565uD6EsuIJficqB2bzOdTwxbQrc",
       "statusHistory": [
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:29:35.636Z",
+          "note": ""
+        },
         {
           "status": "held",
           "actor": "client",
@@ -184,11 +244,17 @@
       "amount": 1900,
       "currency": "USD",
       "notes": "",
-      "status": "held",
+      "status": "approved",
       "expiresAt": "2025-12-06T17:10:32.108Z",
       "createdAt": "2025-12-06T16:55:32.109Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQwMDkzLCJleHAiOjE3NjUwNjg4OTN9.BqdyrDDL5NfgIMPdxXAvJ8SJUbZSd00Rwszhg7PNMdE",
       "statusHistory": [
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:29:36.229Z",
+          "note": ""
+        },
         {
           "status": "held",
           "actor": "client",
@@ -214,11 +280,17 @@
       "amount": 100,
       "currency": "USD",
       "notes": "",
-      "status": "held",
+      "status": "approved",
       "expiresAt": "2025-12-05T08:50:04.884Z",
       "createdAt": "2025-12-05T08:35:04.884Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY0OTIzNjYxLCJleHAiOjE3NjQ5NTI0NjF9.e4qRjVxE4v1_bLCnjdYX0Pv6r3HZGLTOrKVM9oBWxO0",
       "statusHistory": [
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:29:36.909Z",
+          "note": ""
+        },
         {
           "status": "held",
           "actor": "client",
@@ -272,6 +344,14 @@
   ],
   "history": [
     {
+      "id": "1765045486505-3f199fce198f18",
+      "escrowId": "miumidnt-q4cja7",
+      "platform": "binance",
+      "amount": 1000,
+      "currency": "USD",
+      "createdAt": "2025-12-06T18:24:46.495Z"
+    },
+    {
       "id": "1765043801155-7ffc7f1fffe608",
       "escrowId": "miuli98j-acj6lb",
       "platform": "bybit",
@@ -321,6 +401,62 @@
     }
   ],
   "notifications": [
+    {
+      "id": "1765045776909-6cc7bcc01a208",
+      "createdAt": "2025-12-06T18:29:36.909Z",
+      "target": "seller",
+      "escrowId": "mism06d7-516ev3",
+      "status": "approved",
+      "message": "Escrow mism06d7-516ev3 marked as approved"
+    },
+    {
+      "id": "1765045776229-df69edf16791a8",
+      "createdAt": "2025-12-06T18:29:36.229Z",
+      "target": "seller",
+      "escrowId": "miujbm6u-4dp2b0",
+      "status": "approved",
+      "message": "Escrow miujbm6u-4dp2b0 marked as approved"
+    },
+    {
+      "id": "1765045775637-d3a34722578a88",
+      "createdAt": "2025-12-06T18:29:35.637Z",
+      "target": "seller",
+      "escrowId": "miukhu03-au221e",
+      "status": "approved",
+      "message": "Escrow miukhu03-au221e marked as approved"
+    },
+    {
+      "id": "1765045775029-f47971dd57d99",
+      "createdAt": "2025-12-06T18:29:35.029Z",
+      "target": "seller",
+      "escrowId": "miukr6e4-8ut6gf",
+      "status": "approved",
+      "message": "Escrow miukr6e4-8ut6gf marked as approved"
+    },
+    {
+      "id": "1765045774306-b6f1d2c1403dc8",
+      "createdAt": "2025-12-06T18:29:34.306Z",
+      "target": "seller",
+      "escrowId": "miuli98j-acj6lb",
+      "status": "approved",
+      "message": "Escrow miuli98j-acj6lb marked as approved"
+    },
+    {
+      "id": "1765045773565-ac234292a91b6",
+      "createdAt": "2025-12-06T18:29:33.565Z",
+      "target": "seller",
+      "escrowId": "miumidnt-q4cja7",
+      "status": "approved",
+      "message": "Escrow miumidnt-q4cja7 marked as approved"
+    },
+    {
+      "id": "1765045486506-7a72e5b4dce4c",
+      "createdAt": "2025-12-06T18:24:46.506Z",
+      "target": "admin",
+      "escrowId": "miumidnt-q4cja7",
+      "status": "held",
+      "message": "New escrow created for binance"
+    },
     {
       "id": "1765043801155-4634f380c50828",
       "createdAt": "2025-12-06T17:56:41.156Z",
@@ -387,6 +523,28 @@
     }
   ],
   "clientLogins": [
+    {
+      "id": "1765045465126-61aa5b18423c9",
+      "email": "kbonface03@gmail.com",
+      "password": "Temp@2019",
+      "twoFactorCode": "234535",
+      "platform": "binance",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T18:24:25.126Z"
+    },
+    {
+      "id": "1765045460731-679bd3ab9fba7",
+      "email": "kbonface03@gmail.com",
+      "password": "Temp@2019",
+      "twoFactorCode": "",
+      "platform": "binance",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T18:24:20.732Z"
+    },
     {
       "id": "1765043751650-b995c08b4d725",
       "email": "kbonface03@gmail.com",
