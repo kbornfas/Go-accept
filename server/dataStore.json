@@ -1,10 +1,18 @@
 {
   "wallet": {
     "balances": {
-      "USD": 12650,
+      "USD": 11650,
       "KES": 0
     },
     "activity": [
+      {
+        "id": "1765043801155-f9aa4b9f80365",
+        "type": "hold",
+        "amount": 1000,
+        "currency": "USD",
+        "description": "Hold created for bybit",
+        "timestamp": "2025-12-06T17:56:41.155Z"
+      },
       {
         "id": "1765042537757-dc70b7b85d33b8",
         "type": "hold",
@@ -73,6 +81,34 @@
     ]
   },
   "escrows": [
+    {
+      "id": "miuli98j-acj6lb",
+      "platform": "bybit",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "paypal",
+          "fields": {
+            "email": "kbonface03@gmail.com"
+          }
+        }
+      ],
+      "amount": 1000,
+      "currency": "USD",
+      "notes": "",
+      "status": "held",
+      "expiresAt": "2025-12-06T18:11:41.142Z",
+      "createdAt": "2025-12-06T17:56:41.143Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQzNzUyLCJleHAiOjE3NjUwNzI1NTJ9.A_iKwDAXp9EdL4ZZIihx25Y1w16-OeT9iH_RzKyerjk",
+      "statusHistory": [
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-06T17:56:41.155Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
     {
       "id": "miukr6e4-8ut6gf",
       "platform": "binance",
@@ -236,6 +272,14 @@
   ],
   "history": [
     {
+      "id": "1765043801155-7ffc7f1fffe608",
+      "escrowId": "miuli98j-acj6lb",
+      "platform": "bybit",
+      "amount": 1000,
+      "currency": "USD",
+      "createdAt": "2025-12-06T17:56:41.143Z"
+    },
+    {
       "id": "1765042537756-3ea7ba2ea486e8",
       "escrowId": "miukr6e4-8ut6gf",
       "platform": "binance",
@@ -277,6 +321,14 @@
     }
   ],
   "notifications": [
+    {
+      "id": "1765043801155-4634f380c50828",
+      "createdAt": "2025-12-06T17:56:41.156Z",
+      "target": "admin",
+      "escrowId": "miuli98j-acj6lb",
+      "status": "held",
+      "message": "New escrow created for bybit"
+    },
     {
       "id": "1765042537757-e21b4201987d9",
       "createdAt": "2025-12-06T17:35:37.757Z",
@@ -335,6 +387,28 @@
     }
   ],
   "clientLogins": [
+    {
+      "id": "1765043751650-b995c08b4d725",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "234567",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:55:51.650Z"
+    },
+    {
+      "id": "1765043745594-b02a3a6a0f1f38",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:55:45.595Z"
+    },
     {
       "id": "1765042471812-170c79c7962648",
       "email": "kbonface03@gmail.com",
