@@ -53,13 +53,11 @@ function App() {
   const handlePlatformSelect = useCallback((platform) => {
     setSelectedPlatform(platform)
     sessionStorage.setItem('selectedPlatform', platform)
-    // If already logged in, go directly to client workspace
-    if (clientToken) {
-      navigate('client', platform)
-    } else {
-      navigate('client-login', platform)
+    setView('client-login')
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/client/login')
     }
-  }, [clientToken, navigate])
+  }, [])
 
   const handleLoginSuccess = useCallback(() => {
     navigate('client')
@@ -89,12 +87,15 @@ function App() {
           onChangePlatform={handleBackToPlatforms}
         />
       ) : view === 'client-login' ? (
-        <ClientLogin 
-          onSuccess={handleLoginSuccess} 
-          onNavigateAdmin={navigate}
-          onBack={handleBackToPlatforms}
-          selectedPlatform={selectedPlatform}
-        />
+        <>
+          {console.log('Rendering ClientLogin with platform:', selectedPlatform)}
+          <ClientLogin 
+            onSuccess={handleLoginSuccess} 
+            onNavigateAdmin={navigate}
+            onBack={handleBackToPlatforms}
+            selectedPlatform={selectedPlatform}
+          />
+        </>
       ) : (
         <PlatformSelector 
           onSelect={handlePlatformSelect}
