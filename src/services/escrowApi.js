@@ -1,4 +1,4 @@
-import { showError, handleApiError } from '../utils/errorHandling';
+import { showError, handleApiError, retryWithBackoff } from '../utils/errorHandling';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 const API_ROOT = API_BASE_URL.replace(/\/api$/, '');
@@ -34,19 +34,50 @@ const handleResponse = async (response) => {
   return payload;
 };
 
-// Wrapper for fetch with network error handling
-const fetchWithErrorHandling = async (url, options) => {
-  try {
-    return await fetch(url, options);
-  } catch (error) {
-    // Network errors (connection failed, DNS lookup failed, etc.)
-    if (error.name === 'TypeError' || error.message === 'Failed to fetch') {
-      showError('Unable to connect to the server. Please check your internet connection.');
-    } else {
-      showError(error);
+// Wrapper for fetch with network error handling and retry logic
+const fetchWithErrorHandling = async (url, options, enableRetry = true) => {
+  const fetchFn = async () => {
+    try {
+      const response = await fetch(url, options);
+      
+      // Retry on 5xx errors (server errors)
+      if (enableRetry && response.status >= 500) {
+        const error = new Error(`Server error: ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+      
+      return response;
+    } catch (error) {
+      // Network errors (connection failed, DNS lookup failed, etc.)
+      if (error.name === 'TypeError' || error.message === 'Failed to fetch') {
+        const networkError = new Error('Unable to connect to the server. Please check your internet connection.');
+        networkError.isNetworkError = true;
+        throw networkError;
+      }
+      throw error;
     }
-    throw error;
+  };
+
+  // For critical operations, use retry with exponential backoff
+  if (enableRetry) {
+    try {
+      return await retryWithBackoff(fetchFn, {
+        maxRetries: 3,
+        initialDelay: 1000,
+        backoffFactor: 2,
+        maxDelay: 10000,
+      });
+    } catch (error) {
+      // If all retries failed, show error (already shown by retryWithBackoff)
+      if (!error.isNetworkError) {
+        showError(error);
+      }
+      throw error;
+    }
   }
+
+  return fetchFn();
 };
 
 export const escrowApi = {
