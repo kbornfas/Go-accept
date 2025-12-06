@@ -577,20 +577,13 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                     
                     {/* Password */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                          <Lock className="w-3 h-3" /> Password
-                        </div>
-                        <button
-                          onClick={() => togglePasswordVisibility(entry.id)}
-                          className="text-slate-400 hover:text-white transition"
-                        >
-                          {showPasswords[entry.id] ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                        </button>
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Lock className="w-3 h-3" /> Password (Hashed)
                       </div>
-                      <p className="text-sm font-mono text-rose-300 break-all">
-                        {showPasswords[entry.id] ? entry.password : '••••••••'}
+                      <p className="text-xs font-mono text-slate-500 break-all truncate" title={entry.password}>
+                        {entry.password ? `${entry.password.substring(0, 20)}...` : 'Not captured'}
                       </p>
+                      <span className="text-[10px] text-emerald-400 mt-1 block">✓ Securely hashed with bcrypt</span>
                     </div>
                     
                     {/* 2FA Code */}

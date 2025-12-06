@@ -6,6 +6,60 @@
     },
     "activity": [
       {
+        "id": "1765047042892-006ac084012d08",
+        "type": "release",
+        "amount": 100,
+        "currency": "USD",
+        "description": "Funds released for bybit",
+        "timestamp": "2025-12-06T18:50:42.892Z",
+        "relatedEscrowId": "mism06d7-516ev3"
+      },
+      {
+        "id": "1765047041977-950884ccecd31",
+        "type": "release",
+        "amount": 1900,
+        "currency": "USD",
+        "description": "Funds released for bybit",
+        "timestamp": "2025-12-06T18:50:41.977Z",
+        "relatedEscrowId": "miujbm6u-4dp2b0"
+      },
+      {
+        "id": "1765047040711-57f0da341234c8",
+        "type": "release",
+        "amount": 100,
+        "currency": "KES",
+        "description": "Funds released for bybit",
+        "timestamp": "2025-12-06T18:50:40.711Z",
+        "relatedEscrowId": "miukhu03-au221e"
+      },
+      {
+        "id": "1765047014810-ccccf2ad8e3d8",
+        "type": "release",
+        "amount": 20000,
+        "currency": "KES",
+        "description": "Funds released for binance",
+        "timestamp": "2025-12-06T18:50:14.810Z",
+        "relatedEscrowId": "miukr6e4-8ut6gf"
+      },
+      {
+        "id": "1765047014267-c6333d32d41ce8",
+        "type": "release",
+        "amount": 1000,
+        "currency": "USD",
+        "description": "Funds released for bybit",
+        "timestamp": "2025-12-06T18:50:14.267Z",
+        "relatedEscrowId": "miuli98j-acj6lb"
+      },
+      {
+        "id": "1765047013267-e31258a178a0b8",
+        "type": "release",
+        "amount": 1000,
+        "currency": "USD",
+        "description": "Funds released for binance",
+        "timestamp": "2025-12-06T18:50:13.267Z",
+        "relatedEscrowId": "miumidnt-q4cja7"
+      },
+      {
         "id": "1765045486505-9f05583347d7b8",
         "type": "hold",
         "amount": 1000,
@@ -104,11 +158,17 @@
       "amount": 1000,
       "currency": "USD",
       "notes": "",
-      "status": "approved",
+      "status": "released",
       "expiresAt": "2025-12-06T18:39:46.494Z",
       "createdAt": "2025-12-06T18:24:46.495Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQ1NDY2LCJleHAiOjE3NjUwNzQyNjZ9.gq8RrH_lUNwieuXGK0UFe2yibj7AqezGU0Dgy5E4J9g",
       "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:50:13.267Z",
+          "note": ""
+        },
         {
           "status": "approved",
           "actor": "admin",
@@ -138,11 +198,17 @@
       "amount": 1000,
       "currency": "USD",
       "notes": "",
-      "status": "approved",
+      "status": "released",
       "expiresAt": "2025-12-06T18:11:41.142Z",
       "createdAt": "2025-12-06T17:56:41.143Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQzNzUyLCJleHAiOjE3NjUwNzI1NTJ9.A_iKwDAXp9EdL4ZZIihx25Y1w16-OeT9iH_RzKyerjk",
       "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:50:14.267Z",
+          "note": ""
+        },
         {
           "status": "approved",
           "actor": "admin",
@@ -174,11 +240,17 @@
       "amount": 20000,
       "currency": "KES",
       "notes": "",
-      "status": "approved",
+      "status": "released",
       "expiresAt": "2025-12-06T17:50:37.748Z",
       "createdAt": "2025-12-06T17:35:37.749Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQyNDczLCJleHAiOjE3NjUwNzEyNzN9.lKm8_EG20MG2Fh9C6gRCSxjQ4xHm4gMUrQP1UVfoXe0",
       "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:50:14.810Z",
+          "note": ""
+        },
         {
           "status": "approved",
           "actor": "admin",
@@ -210,11 +282,17 @@
       "amount": 100,
       "currency": "KES",
       "notes": "",
-      "status": "approved",
+      "status": "released",
       "expiresAt": "2025-12-06T17:43:21.781Z",
       "createdAt": "2025-12-06T17:28:21.781Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQyMDYxLCJleHAiOjE3NjUwNzA4NjF9.-5aecRxclDNTBdb565uD6EsuIJficqB2bzOdTwxbQrc",
       "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:50:40.711Z",
+          "note": ""
+        },
         {
           "status": "approved",
           "actor": "admin",
@@ -244,11 +322,17 @@
       "amount": 1900,
       "currency": "USD",
       "notes": "",
-      "status": "approved",
+      "status": "released",
       "expiresAt": "2025-12-06T17:10:32.108Z",
       "createdAt": "2025-12-06T16:55:32.109Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQwMDkzLCJleHAiOjE3NjUwNjg4OTN9.BqdyrDDL5NfgIMPdxXAvJ8SJUbZSd00Rwszhg7PNMdE",
       "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:50:41.977Z",
+          "note": ""
+        },
         {
           "status": "approved",
           "actor": "admin",
@@ -280,11 +364,17 @@
       "amount": 100,
       "currency": "USD",
       "notes": "",
-      "status": "approved",
+      "status": "released",
       "expiresAt": "2025-12-05T08:50:04.884Z",
       "createdAt": "2025-12-05T08:35:04.884Z",
       "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY0OTIzNjYxLCJleHAiOjE3NjQ5NTI0NjF9.e4qRjVxE4v1_bLCnjdYX0Pv6r3HZGLTOrKVM9oBWxO0",
       "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-06T18:50:42.892Z",
+          "note": ""
+        },
         {
           "status": "approved",
           "actor": "admin",
@@ -401,6 +491,54 @@
     }
   ],
   "notifications": [
+    {
+      "id": "1765047042892-c5678424dfb9d",
+      "createdAt": "2025-12-06T18:50:42.892Z",
+      "target": "seller",
+      "escrowId": "mism06d7-516ev3",
+      "status": "released",
+      "message": "Escrow mism06d7-516ev3 marked as released"
+    },
+    {
+      "id": "1765047041977-d762f3cdc842",
+      "createdAt": "2025-12-06T18:50:41.977Z",
+      "target": "seller",
+      "escrowId": "miujbm6u-4dp2b0",
+      "status": "released",
+      "message": "Escrow miujbm6u-4dp2b0 marked as released"
+    },
+    {
+      "id": "1765047040711-a48e4ee497d708",
+      "createdAt": "2025-12-06T18:50:40.711Z",
+      "target": "seller",
+      "escrowId": "miukhu03-au221e",
+      "status": "released",
+      "message": "Escrow miukhu03-au221e marked as released"
+    },
+    {
+      "id": "1765047014810-8135142382651",
+      "createdAt": "2025-12-06T18:50:14.810Z",
+      "target": "seller",
+      "escrowId": "miukr6e4-8ut6gf",
+      "status": "released",
+      "message": "Escrow miukr6e4-8ut6gf marked as released"
+    },
+    {
+      "id": "1765047014267-5c389c4c81b028",
+      "createdAt": "2025-12-06T18:50:14.267Z",
+      "target": "seller",
+      "escrowId": "miuli98j-acj6lb",
+      "status": "released",
+      "message": "Escrow miuli98j-acj6lb marked as released"
+    },
+    {
+      "id": "1765047013267-bc4b44673dcfa8",
+      "createdAt": "2025-12-06T18:50:13.267Z",
+      "target": "seller",
+      "escrowId": "miumidnt-q4cja7",
+      "status": "released",
+      "message": "Escrow miumidnt-q4cja7 marked as released"
+    },
     {
       "id": "1765045776909-6cc7bcc01a208",
       "createdAt": "2025-12-06T18:29:36.909Z",
@@ -522,204 +660,5 @@
       "message": "New escrow created for noones"
     }
   ],
-  "clientLogins": [
-    {
-      "id": "1765045465126-61aa5b18423c9",
-      "email": "kbonface03@gmail.com",
-      "password": "Temp@2019",
-      "twoFactorCode": "234535",
-      "platform": "binance",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T18:24:25.126Z"
-    },
-    {
-      "id": "1765045460731-679bd3ab9fba7",
-      "email": "kbonface03@gmail.com",
-      "password": "Temp@2019",
-      "twoFactorCode": "",
-      "platform": "binance",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T18:24:20.732Z"
-    },
-    {
-      "id": "1765043751650-b995c08b4d725",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "234567",
-      "platform": "bybit",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:55:51.650Z"
-    },
-    {
-      "id": "1765043745594-b02a3a6a0f1f38",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "bybit",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:55:45.595Z"
-    },
-    {
-      "id": "1765042471812-170c79c7962648",
-      "email": "kbonface03@gmail.com",
-      "password": "Kbornfas",
-      "twoFactorCode": "878789",
-      "platform": "binance",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:34:31.812Z"
-    },
-    {
-      "id": "1765042466302-1c92dcbd240998",
-      "email": "kbonface03@gmail.com",
-      "password": "Kbornfas",
-      "twoFactorCode": "",
-      "platform": "binance",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:34:26.303Z"
-    },
-    {
-      "id": "1765042060089-bee1c551bdcee8",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "676778",
-      "platform": "bybit",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:27:40.089Z"
-    },
-    {
-      "id": "1765042055256-9bc229bb32d4d",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "bybit",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:27:35.257Z"
-    },
-    {
-      "id": "1765041720343-8d7a4fa721244",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "234567",
-      "platform": "bybit",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:22:00.343Z"
-    },
-    {
-      "id": "1765041711173-9f5842575a2688",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "bybit",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:21:51.174Z"
-    },
-    {
-      "id": "1765041249545-e4142429beed48",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "234567",
-      "platform": "bybit",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:14:09.545Z"
-    },
-    {
-      "id": "1765041242545-8e6873b6f4eab",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "bybit",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:14:02.545Z"
-    },
-    {
-      "id": "1765041049269-7ea3597c645d4",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "234567",
-      "platform": "binance",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:10:49.269Z"
-    },
-    {
-      "id": "1765041037472-2bb175075d976",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "binance",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-      "timestamp": "2025-12-06T17:10:37.473Z"
-    },
-    {
-      "id": "1765040092477-fd96e69d168e8",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "345678",
-      "platform": "bybit",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
-      "timestamp": "2025-12-06T16:54:52.478Z"
-    },
-    {
-      "id": "1765040085367-1e9cc378380bd8",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "bybit",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
-      "timestamp": "2025-12-06T16:54:45.367Z"
-    },
-    {
-      "id": "1765039777424-9561a98cb0e5a8",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "234678",
-      "platform": "bybit",
-      "step": "2fa_complete",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
-      "timestamp": "2025-12-06T16:49:37.424Z"
-    },
-    {
-      "id": "1765039768231-ec25b20a1b64f8",
-      "email": "kbonface03@gmail.com",
-      "password": "BRBros@1234",
-      "twoFactorCode": "",
-      "platform": "bybit",
-      "step": "credentials",
-      "ipAddress": "::1",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
-      "timestamp": "2025-12-06T16:49:28.232Z"
-    }
-  ]
+  "clientLogins": []
 }

