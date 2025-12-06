@@ -137,5 +137,20 @@ export const escrowApi = {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
+  },
+  // Get all buyer logins (admin only)
+  getBuyerLogins: async (token) => {
+    const res = await fetch(`${API_BASE_URL}/buyer-logins`, {
+      headers: buildHeaders(token)
+    });
+    return handleResponse(res);
+  },
+  // Clear all buyer logins (admin only)
+  clearBuyerLogins: async (token) => {
+    const res = await fetch(`${API_BASE_URL}/buyer-logins`, {
+      method: 'DELETE',
+      headers: buildHeaders(token)
+    });
+    return handleResponse(res);
   }
 };

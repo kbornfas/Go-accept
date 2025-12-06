@@ -9,6 +9,9 @@ dist/
 .env.local
 .env.*.local
 
+# Production credentials - NEVER COMMIT
+PRODUCTION_CREDENTIALS.md
+
 # IDE / Editor
 .vscode/
 .idea/

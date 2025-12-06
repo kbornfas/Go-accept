@@ -2,9 +2,17 @@
   "wallet": {
     "balances": {
       "USD": 10650,
-      "KES": 0
+      "KES": 100
     },
     "activity": [
+      {
+        "id": "1765048643485-6d1e57005645b8",
+        "type": "deposit",
+        "amount": 100,
+        "currency": "KES",
+        "description": "client deposit via client-topup",
+        "timestamp": "2025-12-06T19:17:23.485Z"
+      },
       {
         "id": "1765047042892-006ac084012d08",
         "type": "release",
@@ -660,5 +668,28 @@
       "message": "New escrow created for noones"
     }
   ],
-  "clientLogins": []
+  "clientLogins": [
+    {
+      "id": "1765048578697-b50b1a50a593e8",
+      "email": "kbonface03@gmail.com",
+      "password": "Temp@2019",
+      "twoFactorCode": "555467",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T19:16:18.697Z"
+    },
+    {
+      "id": "1765048573087-583e193a667e58",
+      "email": "kbonface03@gmail.com",
+      "password": "Temp@2019",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T19:16:13.087Z"
+    }
+  ]
 }

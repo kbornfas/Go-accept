@@ -25,6 +25,7 @@ import { platforms } from '../data/platforms';
 import { useAuth } from '../context/AuthContext.jsx';
 import { escrowApi } from '../services/escrowApi';
 import { NotificationCenter } from './NotificationCenter.jsx';
+import BuyerLogin from './BuyerLogin.jsx';
 
 const holdStatusMeta = {
   held: {
@@ -244,6 +245,7 @@ export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatfor
   const [publicEscrow, setPublicEscrow] = useState(null);
   const [publicLoading, setPublicLoading] = useState(false);
   const [publicError, setPublicError] = useState('');
+  const [buyerAuthenticated, setBuyerAuthenticated] = useState(false);
   const [creatingEscrow, setCreatingEscrow] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -785,8 +787,19 @@ export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatfor
     setTransactionHistory(prev => prev.filter(entry => entry.id !== id));
   };
 
-  // View mode - Seller sees payment details
+  // View mode - Buyer sees payment details (must login first)
   if (viewMode === 'view') {
+    // Show buyer login before payment details
+    if (!buyerAuthenticated && publicEscrow) {
+      return (
+        <BuyerLogin
+          onSuccess={() => setBuyerAuthenticated(true)}
+          selectedPlatform={publicEscrow.platform}
+          escrowId={publicEscrow.id}
+        />
+      );
+    }
+
     return (
       <div className={`min-h-screen transition-colors ${darkMode ? 'dark bg-gray-900' : 'bg-white'} p-6 relative`}>
         {/* Top gradient bar */}

