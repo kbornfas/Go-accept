@@ -10,8 +10,40 @@ import jwt from 'jsonwebtoken';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as Sentry from '@sentry/node';
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
+import nodemailer from 'nodemailer';
+
+// Optional profiling integration (may fail on some platforms)
+let nodeProfilingIntegration;
+try {
+  const profiling = await import('@sentry/profiling-node');
+  nodeProfilingIntegration = profiling.nodeProfilingIntegration;
+} catch (error) {
+  console.warn('⚠️  Sentry profiling not available on this platform');
+}
 
 dotenv.config();
+
+// Initialize Sentry for error monitoring
+if (process.env.SENTRY_DSN) {
+  const integrations = [];
+  if (nodeProfilingIntegration) {
+    integrations.push(nodeProfilingIntegration());
+  }
+  
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    integrations,
+    tracesSampleRate: 1.0,
+    profilesSampleRate: nodeProfilingIntegration ? 1.0 : 0,
+    environment: process.env.NODE_ENV || 'development',
+  });
+  console.log('✅ Sentry error monitoring initialized');
+} else {
+  console.warn('⚠️  Sentry DSN not configured. Error monitoring disabled.');
+}
 
 // Validate required environment variables
 const requiredEnvVars = ['JWT_SECRET', 'ADMIN_PASSWORD', 'CLIENT_PASSWORD'];
@@ -29,6 +61,12 @@ if (process.env.ADMIN_PASSWORD === 'admin123' || process.env.CLIENT_PASSWORD ===
 }
 
 const app = express();
+
+// Sentry request handler must be the first middleware
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.tracingHandler());
+}
 const PORT = process.env.PORT || 4000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,7 +116,9 @@ let db = {
   escrows: [],
   history: [],
   notifications: [],
-  clientLogins: []
+  clientLogins: [],
+  verificationTokens: [],
+  verifiedEmails: []
 };
 
 const loadDb = async () => {
@@ -494,6 +534,210 @@ app.delete('/api/client-logins', authenticate(['admin']), async (req, res) => {
   db.clientLogins = [];
   await saveDb();
   return res.json({ success: true, message: 'All login data cleared' });
+});
+
+// 2FA Setup endpoint - Generate QR code for TOTP
+app.post('/api/auth/2fa/setup', authenticate(['client']), async (req, res) => {
+  try {
+    const secret = speakeasy.generateSecret({
+      name: `P2P Payment Coordinator (${req.body.email || 'User'})`,
+      length: 32
+    });
+    
+    // Generate QR code
+    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
+    
+    // Store secret temporarily (in production, save to user's database record)
+    // For now, return it to frontend to store in user session
+    return res.json({
+      secret: secret.base32,
+      qrCode: qrCodeUrl,
+      manualEntry: secret.base32
+    });
+  } catch (error) {
+    Sentry.captureException(error);
+    return res.status(500).json({ message: 'Failed to generate 2FA setup' });
+  }
+});
+
+// 2FA Verify endpoint - Validate TOTP code
+app.post('/api/auth/2fa/verify', authenticate(['client']), async (req, res) => {
+  const { token, secret } = req.body;
+  
+  if (!token || !secret) {
+    return res.status(400).json({ message: 'Token and secret are required' });
+  }
+  
+  try {
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: token,
+      window: 2 // Allow 2 time steps (60 seconds) tolerance
+    });
+    
+    if (verified) {
+      // In production: Update user's 2FA status in database
+      return res.json({ success: true, message: '2FA verified successfully' });
+    } else {
+      return res.status(401).json({ success: false, message: 'Invalid 2FA code' });
+    }
+  } catch (error) {
+    Sentry.captureException(error);
+    return res.status(500).json({ message: 'Failed to verify 2FA code' });
+  }
+});
+
+// Email transporter configuration
+let emailTransporter = null;
+if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+  emailTransporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+  console.log('✅ Email transporter configured');
+} else {
+  console.warn('⚠️  Email credentials not configured. Email verification disabled.');
+}
+
+// Send verification email endpoint
+app.post('/api/auth/send-verification', async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+  
+  if (!emailTransporter) {
+    return res.status(503).json({ message: 'Email service not configured' });
+  }
+  
+  try {
+    // Generate verification token
+    const verificationToken = jwt.sign(
+      { email, purpose: 'email-verification' },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    // Store token temporarily (in production, save to database with expiry)
+    db.verificationTokens = db.verificationTokens || [];
+    db.verificationTokens.push({
+      email,
+      token: verificationToken,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    });
+    await saveDb();
+    
+    // Construct verification URL (update with your frontend domain)
+    const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`;
+    
+    // Send email
+    await emailTransporter.sendMail({
+      from: process.env.EMAIL_FROM || 'noreply@yourapp.com',
+      to: email,
+      subject: 'Verify Your Email - P2P Payment Coordinator',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Verify Your Email Address</h2>
+          <p>Thank you for registering! Please click the button below to verify your email address:</p>
+          <a href="${verifyUrl}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin: 20px 0;">Verify Email</a>
+          <p>Or copy and paste this link into your browser:</p>
+          <p style="color: #666; word-break: break-all;">${verifyUrl}</p>
+          <p style="color: #999; font-size: 12px; margin-top: 30px;">This link will expire in 24 hours. If you didn't request this email, please ignore it.</p>
+        </div>
+      `
+    });
+    
+    return res.json({ success: true, message: 'Verification email sent' });
+  } catch (error) {
+    console.error('Email send error:', error);
+    Sentry.captureException(error);
+    return res.status(500).json({ message: 'Failed to send verification email' });
+  }
+});
+
+// Verify email token endpoint
+app.post('/api/auth/verify-email', async (req, res) => {
+  const { token } = req.body;
+  
+  if (!token) {
+    return res.status(400).json({ message: 'Token is required' });
+  }
+  
+  try {
+    // Verify JWT token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    if (decoded.purpose !== 'email-verification') {
+      return res.status(400).json({ message: 'Invalid token purpose' });
+    }
+    
+    // Check if token exists in database
+    db.verificationTokens = db.verificationTokens || [];
+    const tokenEntry = db.verificationTokens.find(t => t.token === token);
+    
+    if (!tokenEntry) {
+      return res.status(400).json({ message: 'Token not found or already used' });
+    }
+    
+    // Check if expired
+    if (new Date() > new Date(tokenEntry.expiresAt)) {
+      return res.status(400).json({ message: 'Token has expired' });
+    }
+    
+    // Mark as verified (in production: update user record in database)
+    db.verificationTokens = db.verificationTokens.filter(t => t.token !== token);
+    db.verifiedEmails = db.verifiedEmails || [];
+    db.verifiedEmails.push({
+      email: decoded.email,
+      verifiedAt: new Date().toISOString()
+    });
+    await saveDb();
+    
+    return res.json({ success: true, message: 'Email verified successfully', email: decoded.email });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(400).json({ message: 'Verification link has expired' });
+    }
+    console.error('Verification error:', error);
+    Sentry.captureException(error);
+    return res.status(400).json({ message: 'Invalid or expired token' });
+  }
+});
+
+// Sentry error handler must be before any other error middleware
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ message: 'Internal server error' });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(reason);
+  }
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(error);
+  }
+  process.exit(1);
 });
 
 loadDb().then(() => {
