@@ -43,20 +43,29 @@ export async function logAuditEvent(eventData) {
       userRole,
     };
 
-    await query(
-      `INSERT INTO audit_log 
-       (user_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
-      [
-        userId,
-        action,
-        resourceType,
-        resourceId,
-        JSON.stringify(enrichedDetails),
-        ipAddress,
-        userAgent,
-      ]
-    );
+    // Only log to database if using PostgreSQL
+    // Skip database logging when using file-based storage
+    try {
+      await query(
+        `INSERT INTO audit_log 
+         (user_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
+        [
+          userId,
+          action,
+          resourceType,
+          resourceId,
+          JSON.stringify(enrichedDetails),
+          ipAddress,
+          userAgent,
+        ]
+      );
+    } catch (dbError) {
+      // Silently skip if database not available (file-based mode)
+      if (!dbError.message.includes('Database not initialized')) {
+        console.error('Audit log database error:', dbError.message);
+      }
+    }
 
     console.log(`📝 Audit log: ${action} by ${userEmail || 'unknown'} (${ipAddress})`);
   } catch (error) {

