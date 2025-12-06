@@ -111,6 +111,36 @@ CREATE TABLE IF NOT EXISTS verified_emails (
 
 CREATE INDEX idx_verified_emails_email ON verified_emails(email);
 
+-- Password reset tokens
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL, -- 'admin', 'client'
+  token TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  used_at TIMESTAMP
+);
+
+CREATE INDEX idx_reset_tokens_email ON password_reset_tokens(email);
+CREATE INDEX idx_reset_tokens_token ON password_reset_tokens(token);
+CREATE INDEX idx_reset_tokens_expires ON password_reset_tokens(expires_at);
+CREATE INDEX idx_reset_tokens_used ON password_reset_tokens(used);
+
+-- Password change history
+CREATE TABLE IF NOT EXISTS password_changes (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL,
+  password_hash TEXT NOT NULL,
+  changed_at TIMESTAMP DEFAULT NOW(),
+  ip_address VARCHAR(50)
+);
+
+CREATE INDEX idx_password_changes_email ON password_changes(email);
+CREATE INDEX idx_password_changes_date ON password_changes(changed_at);
+
 -- User accounts (for future authentication system)
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
