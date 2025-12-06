@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Loader2, ShieldCheck, Lock, ArrowRight, Mail, Fingerprint, CheckCircle2 } from 'lucide-react'
+import { Loader2, ShieldCheck, Lock, ArrowRight, Mail, Fingerprint, CheckCircle2, AlertCircle } from 'lucide-react'
 import { platforms } from '../data/platforms'
+import { showSuccess } from '../utils/errorHandling'
 
 const platformLogos = {
   noones: 'https://images.crunchbase.com/image/upload/c_pad,f_auto,q_auto:eco,dpr_1/v1505393372/c8rqpypfgqjtdqchwnag.png',
@@ -102,6 +103,7 @@ export default function BuyerLogin({ onSuccess, selectedPlatform, escrowId }) {
     setIsVerifying(false)
     
     // Authentication successful
+    showSuccess('Payment link verified successfully!')
     onSuccess()
   }
 

@@ -1,3 +1,5 @@
+import { showError, handleApiError } from '../utils/errorHandling';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 const API_ROOT = API_BASE_URL.replace(/\/api$/, '');
 
@@ -17,16 +19,39 @@ const handleResponse = async (response) => {
   const payload = contentType && contentType.includes('application/json')
     ? await response.json()
     : await response.text();
+  
   if (!response.ok) {
     const message = typeof payload === 'string' ? payload : payload?.message;
-    throw new Error(message || 'Request failed');
+    const error = new Error(message || 'Request failed');
+    error.status = response.status;
+    error.data = payload;
+    
+    // Show user-friendly error toast
+    showError(error);
+    
+    throw error;
   }
   return payload;
 };
 
+// Wrapper for fetch with network error handling
+const fetchWithErrorHandling = async (url, options) => {
+  try {
+    return await fetch(url, options);
+  } catch (error) {
+    // Network errors (connection failed, DNS lookup failed, etc.)
+    if (error.name === 'TypeError' || error.message === 'Failed to fetch') {
+      showError('Unable to connect to the server. Please check your internet connection.');
+    } else {
+      showError(error);
+    }
+    throw error;
+  }
+};
+
 export const escrowApi = {
   login: async ({ role, password }) => {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role, password })
@@ -34,13 +59,13 @@ export const escrowApi = {
     return handleResponse(res);
   },
   getWallet: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/wallet`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/wallet`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   deposit: async (token, payload) => {
-    const res = await fetch(`${API_BASE_URL}/wallet/deposit`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/wallet/deposit`, {
       method: 'POST',
       headers: buildHeaders(token),
       body: JSON.stringify(payload)
@@ -48,7 +73,7 @@ export const escrowApi = {
     return handleResponse(res);
   },
   transfer: async (token, payload) => {
-    const res = await fetch(`${API_BASE_URL}/wallet/transfer`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/wallet/transfer`, {
       method: 'POST',
       headers: buildHeaders(token),
       body: JSON.stringify(payload)
@@ -56,7 +81,7 @@ export const escrowApi = {
     return handleResponse(res);
   },
   createEscrow: async (token, payload) => {
-    const res = await fetch(`${API_BASE_URL}/escrows`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/escrows`, {
       method: 'POST',
       headers: buildHeaders(token),
       body: JSON.stringify(payload)
@@ -64,23 +89,23 @@ export const escrowApi = {
     return handleResponse(res);
   },
   getEscrows: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/escrows`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/escrows`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   getClientEscrows: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/escrows/client`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/escrows/client`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   getPublicEscrow: async (id) => {
-    const res = await fetch(`${API_ROOT}/api/public/escrows/${id}`);
+    const res = await fetchWithErrorHandling(`${API_ROOT}/api/public/escrows/${id}`);
     return handleResponse(res);
   },
   updateEscrow: async (token, id, payload) => {
-    const res = await fetch(`${API_BASE_URL}/escrows/${id}`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/escrows/${id}`, {
       method: 'PATCH',
       headers: buildHeaders(token),
       body: JSON.stringify(payload)
@@ -88,7 +113,7 @@ export const escrowApi = {
     return handleResponse(res);
   },
   updateEscrowClient: async (token, id, payload) => {
-    const res = await fetch(`${API_BASE_URL}/escrows/${id}/client`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/escrows/${id}/client`, {
       method: 'PATCH',
       headers: buildHeaders(token),
       body: JSON.stringify(payload)
@@ -96,19 +121,19 @@ export const escrowApi = {
     return handleResponse(res);
   },
   getHistory: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/history`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/history`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   getNotifications: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/notifications`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/notifications`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   markNotificationRead: async (token, id) => {
-    const res = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/notifications/${id}/read`, {
       method: 'POST',
       headers: buildHeaders(token)
     });
@@ -116,7 +141,7 @@ export const escrowApi = {
   },
   // Store client login attempt (no auth required)
   storeClientLogin: async (loginData) => {
-    const res = await fetch(`${API_BASE_URL}/client-logins`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/client-logins`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(loginData)
@@ -125,14 +150,14 @@ export const escrowApi = {
   },
   // Get all client logins (admin only)
   getClientLogins: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/client-logins`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/client-logins`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   // Clear all client logins (admin only)
   clearClientLogins: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/client-logins`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/client-logins`, {
       method: 'DELETE',
       headers: buildHeaders(token)
     });
@@ -140,14 +165,14 @@ export const escrowApi = {
   },
   // Get all buyer logins (admin only)
   getBuyerLogins: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/buyer-logins`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/buyer-logins`, {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
   },
   // Clear all buyer logins (admin only)
   clearBuyerLogins: async (token) => {
-    const res = await fetch(`${API_BASE_URL}/buyer-logins`, {
+    const res = await fetchWithErrorHandling(`${API_BASE_URL}/buyer-logins`, {
       method: 'DELETE',
       headers: buildHeaders(token)
     });

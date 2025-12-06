@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Key, Check, AlertCircle } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { showSuccess, showError as showErrorToast } from '../utils/errorHandling';
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -70,14 +71,19 @@ function ResetPassword() {
 
       if (res.ok) {
         setSuccess(true);
+        showSuccess('Password reset successful! Redirecting to login...');
         setTimeout(() => {
           navigate('/login');
         }, 3000);
       } else {
-        setError(data.message || 'Failed to reset password');
+        const errorMsg = data.message || 'Failed to reset password';
+        setError(errorMsg);
+        showErrorToast(errorMsg);
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      const errorMsg = 'Network error. Please try again.';
+      setError(errorMsg);
+      showErrorToast(errorMsg);
     } finally {
       setLoading(false);
     }

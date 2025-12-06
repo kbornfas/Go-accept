@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { showSuccess, showError as showErrorToast } from '../utils/errorHandling';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -25,13 +26,19 @@ function ForgotPassword() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage(data.message || 'Password reset email sent! Check your inbox.');
+        const successMsg = data.message || 'Password reset email sent! Check your inbox.';
+        setMessage(successMsg);
+        showSuccess(successMsg);
         setEmail('');
       } else {
-        setError(data.message || 'Failed to send reset email');
+        const errorMsg = data.message || 'Failed to send reset email';
+        setError(errorMsg);
+        showErrorToast(errorMsg);
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      const errorMsg = 'Network error. Please try again.';
+      setError(errorMsg);
+      showErrorToast(errorMsg);
     } finally {
       setLoading(false);
     }

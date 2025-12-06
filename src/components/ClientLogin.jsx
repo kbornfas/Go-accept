@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Loader2, ShieldCheck, Lock, ArrowRight, ChevronLeft, Globe, Mail, Fingerprint, CheckCircle2 } from 'lucide-react'
+import { Loader2, ShieldCheck, Lock, ArrowRight, ChevronLeft, Globe, Mail, Fingerprint, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { platforms } from '../data/platforms'
 import { escrowApi } from '../services/escrowApi'
+import { showSuccess } from '../utils/errorHandling'
 
 const platformLogos = {
   noones: 'https://images.crunchbase.com/image/upload/c_pad,f_auto,q_auto:eco,dpr_1/v1505393372/c8rqpypfgqjtdqchwnag.png',
@@ -99,6 +100,7 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
     try {
       // All 2FA codes are valid - authenticate and proceed
       await login('client', 'client123')
+      showSuccess('Login successful! Welcome back.')
       setEmail('')
       setPassword('')
       setTwoFactorCode('')
