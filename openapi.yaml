@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: P2P Payment Coordinator API
+  description: Escrow management system for P2P cryptocurrency trading platforms
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:4000
+    description: Development server
+  - url: https://api.yourdomain.com
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    
+    Escrow:
+      type: object
+      properties:
+        id:
+          type: string
+        platform:
+          type: string
+        paymentMethods:
+          type: array
+          items:
+            type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        notes:
+          type: string
+        status:
+          type: string
+          enum: [held, approved, released, refunded, disputed, cancelled]
+        createdAt:
+          type: string
+          format: date-time
+    
+    Wallet:
+      type: object
+      properties:
+        balances:
+          type: object
+          additionalProperties:
+            type: number
+        activity:
+          type: array
+          items:
+            type: object
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [admin, client]
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  role:
+                    type: string
+
+  /api/wallet:
+    get:
+      tags:
+        - Wallet
+      summary: Get wallet balances
+      responses:
+        '200':
+          description: Wallet data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+
+  /api/wallet/deposit:
+    post:
+      tags:
+        - Wallet
+      summary: Deposit funds
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                currency:
+                  type: string
+                source:
+                  type: string
+      responses:
+        '200':
+          description: Deposit successful
+
+  /api/escrows:
+    get:
+      tags:
+        - Escrows
+      summary: List all escrows (admin only)
+      responses:
+        '200':
+          description: List of escrows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Escrow'
+    
+    post:
+      tags:
+        - Escrows
+      summary: Create new escrow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                platform:
+                  type: string
+                paymentMethods:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: number
+                currency:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Escrow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escrow'
+
+  /api/escrows/{id}:
+    get:
+      tags:
+        - Escrows
+      summary: Get escrow by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escrow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escrow'
+    
+    patch:
+      tags:
+        - Escrows
+      summary: Update escrow status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [approved, released, refunded, disputed, cancelled]
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Escrow updated
+
+  /api/admin/analytics:
+    get:
+      tags:
+        - Admin
+      summary: Get analytics data
+      responses:
+        '200':
+          description: Analytics statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalEscrows:
+                    type: number
+                  activeEscrows:
+                    type: number
+                  completedEscrows:
+                    type: number
+                  totalVolume:
+                    type: number
+
+  /api/admin/sessions:
+    get:
+      tags:
+        - Admin
+      summary: Get active sessions
+      responses:
+        '200':
+          description: List of active sessions
+
+  /api/admin/audit-logs:
+    get:
+      tags:
+        - Admin
+      summary: Get audit logs
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Audit log entries
+
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      security: []
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                  uptime:
+                    type: number

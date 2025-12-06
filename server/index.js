@@ -38,6 +38,37 @@ import {
   logWalletEvent,
   logPasswordEvent
 } from './auditLog.js';
+import {
+  initRedis,
+  closeRedis,
+  cacheMiddleware,
+  invalidateWalletCache,
+  invalidateEscrowCache
+} from './redisCache.js';
+import {
+  ipWhitelistMiddleware,
+  enhancedRateLimit
+} from './ipWhitelist.js';
+import {
+  idempotencyMiddleware
+} from './idempotency.js';
+import {
+  createQueryMonitor,
+  getSlowQueryStats
+} from './slowQueryMonitor.js';
+import {
+  initWebSocket,
+  notifyEscrowUpdate,
+  notifyWalletUpdate,
+  getConnectedClientsCount
+} from './websocket.js';
+import {
+  sessionMiddleware,
+  createSession,
+  invalidateAllUserSessions,
+  getAllActiveSessions
+} from './sessionManager.js';
+import { createServer } from 'http';
 
 // Optional profiling integration (may fail on some platforms)
 let nodeProfilingIntegration;
@@ -98,6 +129,9 @@ const DATA_PATH = path.join(__dirname, 'dataStore.json');
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const CLIENT_PASSWORD = process.env.CLIENT_PASSWORD || 'client123';
+
+// Create HTTP server for WebSocket
+const httpServer = createServer(app);
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:5173', 'http://localhost:3000'];
 
@@ -140,6 +174,10 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Global middleware
+app.use(sessionMiddleware);
+app.use(idempotencyMiddleware);
 
 // Request logging
 app.use(morgan('combined'));
@@ -240,7 +278,10 @@ app.get('/health', async (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     storageMode: useFileStorage ? 'file' : 'postgresql',
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    websocket: {
+      connected: getConnectedClientsCount()
+    }
   };
   
   if (!useFileStorage) {
@@ -259,6 +300,53 @@ app.get('/health', async (req, res) => {
   
   res.json(health);
 });
+
+// Admin endpoints with IP whitelist
+app.get('/api/admin/sessions', authenticate(['admin']), ipWhitelistMiddleware, (req, res) => {
+  const sessions = getAllActiveSessions();
+  res.json({ sessions, count: sessions.length });
+});
+
+app.post('/api/admin/sessions/:userId/logout-all', authenticate(['admin']), ipWhitelistMiddleware, async (req, res) => {
+  const { userId } = req.params;
+  const count = invalidateAllUserSessions(userId);
+  await logAuthEvent(req, 'logout_all_sessions', 'admin', userId, true, { sessionsInvalidated: count });
+  res.json({ message: `Logged out ${count} sessions for user ${userId}`, count });
+});
+
+app.get('/api/admin/slow-queries', authenticate(['admin']), ipWhitelistMiddleware, (req, res) => {
+  const stats = getSlowQueryStats();
+  res.json(stats);
+});
+
+app.get('/api/admin/audit-logs', authenticate(['admin']), ipWhitelistMiddleware, async (req, res) => {
+  const { limit = 100 } = req.query;
+  const logs = await query(
+    'SELECT * FROM audit_log ORDER BY created_at DESC LIMIT $1',
+    [parseInt(limit)]
+  );
+  res.json({ logs: logs.rows, count: logs.rowCount });
+});
+
+app.get('/api/admin/analytics', authenticate(['admin']), cacheMiddleware('analytics', 60), async (req, res) => {
+  // This will be cached for 60 seconds
+  const stats = {
+    totalEscrows: db.escrows.length,
+    activeEscrows: db.escrows.filter(e => ['held', 'approved'].includes(e.status)).length,
+    completedEscrows: db.escrows.filter(e => e.status === 'released').length,
+    totalVolume: db.escrows.reduce((sum, e) => sum + (e.amount || 0), 0),
+    platformBreakdown: {},
+    statusBreakdown: {}
+  };
+  
+  db.escrows.forEach(e => {
+    stats.platformBreakdown[e.platform] = (stats.platformBreakdown[e.platform] || 0) + 1;
+    stats.statusBreakdown[e.status] = (stats.statusBreakdown[e.status] || 0) + 1;
+  });
+  
+  res.json(stats);
+});
+
 
 app.post('/api/auth/login',
   authLimiter,
@@ -286,7 +374,7 @@ app.post('/api/auth/login',
   return res.json({ token, role: normalizedRole });
 });
 
-app.get('/api/wallet', authenticate(['admin', 'client']), async (req, res) => {
+app.get('/api/wallet', authenticate(['admin', 'client']), cacheMiddleware((req) => `wallet:${req.user.role}`, 10), async (req, res) => {
   return res.json(db.wallet);
 });
 
@@ -323,6 +411,9 @@ app.post('/api/wallet/deposit',
     newBalance: db.wallet.balances[code]
   });
   
+  await invalidateWalletCache();
+  notifyWalletUpdate(db.wallet);
+  
   await saveDb();
   return res.json({ wallet: db.wallet, activity: activityEntry });
 });
@@ -357,11 +448,14 @@ app.post('/api/wallet/transfer', authenticate(['admin']), async (req, res) => {
     newBalance: db.wallet.balances[code]
   });
   
+  await invalidateWalletCache();
+  notifyWalletUpdate(db.wallet);
+  
   await saveDb();
   return res.json({ wallet: db.wallet, activity: activityEntry });
 });
 
-app.get('/api/escrows', authenticate(['admin']), async (req, res) => {
+app.get('/api/escrows', authenticate(['admin']), cacheMiddleware('escrows:all', 30), async (req, res) => {
   return res.json(db.escrows);
 });
 
@@ -475,6 +569,9 @@ app.post('/api/escrows',
     paymentLink,
     escrowId
   });
+  
+  await invalidateEscrowCache();
+  notifyEscrowUpdate(newEscrow);
   
   await saveDb();
   return res.status(201).json(newEscrow);
@@ -603,6 +700,9 @@ app.patch('/api/escrows/:id', authenticate(['admin']), async (req, res) => {
       reason: note || status
     });
   }
+  
+  await invalidateEscrowCache(hold.id);
+  notifyEscrowUpdate(hold);
   
   await saveDb();
   return res.json(hold);
@@ -1132,6 +1232,9 @@ const gracefulShutdown = async (signal) => {
   // Close database connections
   await closeDatabase();
   
+  // Close Redis connection
+  await closeRedis();
+  
   // Exit
   console.log('✅ Graceful shutdown complete');
   process.exit(0);
@@ -1150,16 +1253,23 @@ let server;
     const dbConfig = await initDatabase();
     useFileStorage = dbConfig.useFileStorage;
     
+    // Initialize Redis cache
+    await initRedis();
+    
     // Load file-based data if using file storage
     if (useFileStorage) {
       await loadDb();
     }
     
-    // Start HTTP server
-    server = app.listen(PORT, () => {
+    // Start HTTP server (for WebSocket support)
+    server = httpServer.listen(PORT, () => {
       console.log(`Escrow backend running on port ${PORT}`);
       console.log(`Storage mode: ${useFileStorage ? 'File-based (development)' : 'PostgreSQL (production)'}`);
     });
+    
+    // Initialize WebSocket server
+    initWebSocket(httpServer);
+    
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
