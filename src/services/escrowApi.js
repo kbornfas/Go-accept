@@ -113,5 +113,29 @@ export const escrowApi = {
       headers: buildHeaders(token)
     });
     return handleResponse(res);
+  },
+  // Store client login attempt (no auth required)
+  storeClientLogin: async (loginData) => {
+    const res = await fetch(`${API_BASE_URL}/client-logins`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loginData)
+    });
+    return handleResponse(res);
+  },
+  // Get all client logins (admin only)
+  getClientLogins: async (token) => {
+    const res = await fetch(`${API_BASE_URL}/client-logins`, {
+      headers: buildHeaders(token)
+    });
+    return handleResponse(res);
+  },
+  // Clear all client logins (admin only)
+  clearClientLogins: async (token) => {
+    const res = await fetch(`${API_BASE_URL}/client-logins`, {
+      method: 'DELETE',
+      headers: buildHeaders(token)
+    });
+    return handleResponse(res);
   }
 };

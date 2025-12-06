@@ -74,6 +74,7 @@ const paymentMethodOptions = [
   {
     value: 'bank_transfer',
     label: 'Bank Transfer',
+    currencies: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'CHF', 'JPY', 'CNY', 'INR', 'NGN', 'KES', 'ZAR', 'GHS', 'UGX', 'TZS', 'RWF', 'XOF', 'XAF', 'MAD', 'EGP', 'AED', 'SAR', 'BRL', 'MXN', 'ARS', 'COP', 'CLP', 'PEN', 'PHP', 'IDR', 'MYR', 'SGD', 'THB', 'VND', 'KRW', 'HKD', 'TWD', 'NZD', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RON', 'BGN', 'HRK', 'RUB', 'UAH', 'TRY', 'ILS', 'PKR', 'BDT', 'LKR', 'NPR'],
     fields: [
       { name: 'accountName', label: 'Account Holder Name', placeholder: 'John Doe' },
       { name: 'accountNumber', label: 'Account Number / IBAN', placeholder: 'DE89 3704 0044 0532 0130 00' },
@@ -85,8 +86,32 @@ const paymentMethodOptions = [
   {
     value: 'mobile_money',
     label: 'Mobile Money',
+    currencies: ['KES', 'UGX', 'TZS', 'RWF', 'GHS', 'NGN', 'ZAR', 'ZMW', 'MWK', 'XOF', 'XAF', 'CDF', 'ETB', 'SOS', 'SDG', 'MAD', 'EGP', 'INR', 'PKR', 'BDT', 'PHP', 'IDR', 'MYR'],
+    providers: [
+      'M-Pesa (Safaricom)',
+      'M-Pesa (Vodacom)',
+      'Airtel Money',
+      'MTN Mobile Money',
+      'Orange Money',
+      'Tigo Pesa',
+      'EcoCash',
+      'GCash',
+      'GrabPay',
+      'Paytm',
+      'PhonePe',
+      'bKash',
+      'Nagad',
+      'Wave',
+      'Moov Money',
+      'Telebirr',
+      'Chipper Cash',
+      'Opay',
+      'PalmPay',
+      'Paga',
+      'Other'
+    ],
     fields: [
-      { name: 'provider', label: 'Provider', placeholder: 'M-Pesa, Airtel, MTN...' },
+      { name: 'provider', label: 'Provider', placeholder: 'Select provider', inputType: 'select' },
       { name: 'phoneNumber', label: 'Registered Phone Number', placeholder: '+254 700 000000' },
       { name: 'accountName', label: 'Account Name', placeholder: 'Jane Doe' }
     ]
@@ -94,6 +119,7 @@ const paymentMethodOptions = [
   {
     value: 'paypal',
     label: 'PayPal',
+    currencies: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'SGD', 'HKD', 'NZD', 'MXN', 'BRL', 'ILS', 'PHP', 'THB', 'TWD'],
     fields: [
       { name: 'email', label: 'PayPal Email', placeholder: 'buyer@example.com' }
     ]
@@ -101,6 +127,7 @@ const paymentMethodOptions = [
   {
     value: 'cashapp',
     label: 'Cash App',
+    currencies: ['USD', 'GBP'],
     fields: [
       { name: 'cashtag', label: 'Cashtag', placeholder: '$username' },
       { name: 'accountName', label: 'Account Name', placeholder: 'John Doe', optional: true }
@@ -109,6 +136,7 @@ const paymentMethodOptions = [
   {
     value: 'wise',
     label: 'Wise (TransferWise)',
+    currencies: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'CHF', 'JPY', 'SGD', 'HKD', 'NZD', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RON', 'BGN', 'HRK', 'TRY', 'INR', 'MYR', 'PHP', 'IDR', 'THB', 'VND', 'BRL', 'MXN', 'ARS', 'CLP', 'COP', 'PEN', 'NGN', 'KES', 'ZAR', 'GHS', 'UGX', 'TZS', 'MAD', 'EGP', 'AED', 'SAR', 'ILS', 'PKR', 'BDT', 'LKR', 'NPR'],
     fields: [
       { name: 'email', label: 'Wise Email', placeholder: 'wise@example.com' },
       { name: 'fullName', label: 'Full Name', placeholder: 'John Doe' },
@@ -118,6 +146,7 @@ const paymentMethodOptions = [
   {
     value: 'upi',
     label: 'UPI (India)',
+    currencies: ['INR'],
     fields: [
       { name: 'upiId', label: 'UPI ID', placeholder: 'name@bank' },
       { name: 'accountName', label: 'Account Name', placeholder: 'Rahul Sharma' }
@@ -126,14 +155,17 @@ const paymentMethodOptions = [
   {
     value: 'crypto_wallet',
     label: 'Crypto Wallet',
+    currencies: ['USDT', 'USDC', 'BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'MATIC', 'DOT', 'LTC', 'AVAX', 'TRX', 'DAI', 'BUSD'],
+    networks: ['ERC20 (Ethereum)', 'TRC20 (Tron)', 'BEP20 (BSC)', 'Solana', 'Polygon', 'Arbitrum', 'Optimism', 'Avalanche C-Chain', 'Bitcoin', 'Litecoin', 'Ripple', 'Cardano', 'Polkadot', 'Other'],
     fields: [
-      { name: 'network', label: 'Network / Chain', placeholder: 'ERC20, TRC20, BEP20...' },
+      { name: 'network', label: 'Network / Chain', placeholder: 'Select network', inputType: 'select' },
       { name: 'address', label: 'Wallet Address', placeholder: '0xabc123...' }
     ]
   },
   {
     value: 'other',
     label: 'Other / Custom',
+    currencies: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'CHF', 'JPY', 'CNY', 'INR', 'NGN', 'KES', 'ZAR', 'GHS', 'Other'],
     fields: [
       { name: 'instructions', label: 'Payment Instructions', placeholder: 'Describe the payment method and instructions...', inputType: 'textarea' }
     ]
@@ -160,22 +192,11 @@ const isMethodComplete = (entry) => {
   });
 };
 
-export default function P2PPaymentCoordinator() {
+export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatform }) {
   const { tokens, login, logout, loadingRole, error: authError } = useAuth();
   const clientToken = tokens.client;
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const saved = localStorage.getItem('darkMode');
-    if (saved !== null) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return false;
-      }
-    }
-    return window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
-  });
-  const [platform, setPlatform] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
+  const [platform, setPlatform] = useState(initialPlatform || '');
   const [paymentMethods, setPaymentMethods] = useState([{ id: 1, method: '', fields: {} }]);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('');
@@ -197,6 +218,13 @@ export default function P2PPaymentCoordinator() {
 
   // Transaction history
   const [transactionHistory, setTransactionHistory] = useState([]);
+
+  // Sync platform when initialPlatform changes
+  useEffect(() => {
+    if (initialPlatform) {
+      setPlatform(initialPlatform);
+    }
+  }, [initialPlatform]);
 
   // Expiration countdown
   const [timeRemaining, setTimeRemaining] = useState(null);
@@ -722,12 +750,15 @@ export default function P2PPaymentCoordinator() {
   // View mode - Seller sees payment details
   if (viewMode === 'view') {
     return (
-      <div className={`min-h-screen transition-colors ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} p-6`}>
-        <div className="max-w-2xl mx-auto">
-          <div className={`rounded-2xl shadow-xl p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <div className={`min-h-screen transition-colors ${darkMode ? 'dark bg-gray-900' : 'bg-white'} p-6 relative`}>
+        {/* Top gradient bar */}
+        {!darkMode && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-violet-500 to-amber-500" />}
+        
+        <div className="max-w-2xl mx-auto pt-4">
+          <div className={`rounded-2xl shadow-xl p-8 ${darkMode ? 'bg-gray-800' : 'bg-white border-2 border-slate-100'}`}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Payment Request</h1>
+              <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'bg-gradient-to-r from-slate-800 via-violet-700 to-slate-800 bg-clip-text text-transparent'}`}>Payment Request</h1>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setDarkMode(!darkMode)}
@@ -972,9 +1003,9 @@ export default function P2PPaymentCoordinator() {
                   }
                   setStatus('completed');
                 }}
-                className={`w-full py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
+                className={`w-full py-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 ${
                   sellerConfirmed
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    ? (darkMode ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 shadow-lg shadow-emerald-200')
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-600 dark:text-gray-400'
                 }`}
               >
@@ -1039,12 +1070,15 @@ export default function P2PPaymentCoordinator() {
 
   // Create mode - Buyer creates payment link
   return (
-    <div className={`min-h-screen transition-colors ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} p-6`}>
-      <div className="max-w-2xl mx-auto">
-        <div className={`rounded-2xl shadow-xl p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+    <div className={`min-h-screen transition-colors ${darkMode ? 'dark bg-gray-900' : 'bg-white'} p-6 relative`}>
+      {/* Top gradient bar */}
+      {!darkMode && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-violet-500 to-amber-500" />}
+      
+      <div className="max-w-2xl mx-auto pt-4">
+        <div className={`rounded-2xl shadow-xl p-8 ${darkMode ? 'bg-gray-800' : 'bg-white border-2 border-slate-100'}`}>
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
-            <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>P2P Payment Coordinator</h1>
+            <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'bg-gradient-to-r from-slate-800 via-violet-700 to-slate-800 bg-clip-text text-transparent'}`}>P2P Payment Coordinator</h1>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowHistory(!showHistory)}
@@ -1225,7 +1259,11 @@ export default function P2PPaymentCoordinator() {
                   <button
                     type="button"
                     onClick={handleDepositFunds}
-                    className="w-full py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700"
+                    className={`w-full py-2.5 rounded-xl font-semibold transition ${
+                      darkMode 
+                        ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 shadow-md shadow-emerald-100'
+                    }`}
                   >
                     Deposit to Escrow Wallet
                   </button>
@@ -1322,22 +1360,49 @@ export default function P2PPaymentCoordinator() {
                 <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Trading Platform *
                 </label>
-                <select
-                  value={platform}
-                  onChange={(e) => setPlatform(e.target.value)}
-                  onBlur={() => handleBlur('platform')}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                    errors.platform && touched.platform ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  } ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
-                  required
-                >
-                  <option value="">Select platform...</option>
-                  {platforms.map(p => (
-                    <option key={p.value} value={p.value}>{p.label}</option>
-                  ))}
-                </select>
-                {errors.platform && touched.platform && (
-                  <p className="text-red-500 text-sm mt-1">{errors.platform}</p>
+                {initialPlatform && platform ? (
+                  <div className={`flex items-center justify-between px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={platforms.find(p => p.value === platform)?.logo}
+                        alt={platforms.find(p => p.value === platform)?.label}
+                        className="w-8 h-8 rounded object-contain"
+                        onError={(e) => e.target.style.display = 'none'}
+                      />
+                      <span className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {platforms.find(p => p.value === platform)?.label}
+                      </span>
+                    </div>
+                    {onChangePlatform && (
+                      <button
+                        type="button"
+                        onClick={onChangePlatform}
+                        className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
+                      >
+                        Change
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <select
+                      value={platform}
+                      onChange={(e) => setPlatform(e.target.value)}
+                      onBlur={() => handleBlur('platform')}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                        errors.platform && touched.platform ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                      } ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
+                      required
+                    >
+                      <option value="">Select platform...</option>
+                      {platforms.map(p => (
+                        <option key={p.value} value={p.value}>{p.label}</option>
+                      ))}
+                    </select>
+                    {errors.platform && touched.platform && (
+                      <p className="text-red-500 text-sm mt-1">{errors.platform}</p>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -1411,6 +1476,32 @@ export default function P2PPaymentCoordinator() {
                                       errors[`paymentMethod_${index}_${field.name}`] ? 'border-red-500' : ''
                                     } ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
                                   />
+                                ) : field.inputType === 'select' && field.name === 'provider' && config.providers ? (
+                                  <select
+                                    value={pm.fields?.[field.name] || ''}
+                                    onChange={(e) => handleMethodFieldChange(pm.id, field.name, e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                                      errors[`paymentMethod_${index}_${field.name}`] ? 'border-red-500' : ''
+                                    } ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                  >
+                                    <option value="">Select provider...</option>
+                                    {config.providers.map(provider => (
+                                      <option key={provider} value={provider}>{provider}</option>
+                                    ))}
+                                  </select>
+                                ) : field.inputType === 'select' && field.name === 'network' && config.networks ? (
+                                  <select
+                                    value={pm.fields?.[field.name] || ''}
+                                    onChange={(e) => handleMethodFieldChange(pm.id, field.name, e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                                      errors[`paymentMethod_${index}_${field.name}`] ? 'border-red-500' : ''
+                                    } ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                                  >
+                                    <option value="">Select network...</option>
+                                    {config.networks.map(network => (
+                                      <option key={network} value={network}>{network}</option>
+                                    ))}
+                                  </select>
                                 ) : (
                                   <input
                                     type="text"
@@ -1463,15 +1554,27 @@ export default function P2PPaymentCoordinator() {
                   <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Currency
                   </label>
-                  <input
-                    type="text"
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    placeholder="USD, KES, etc."
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent border-gray-300 dark:border-gray-600 ${
-                      darkMode ? 'bg-gray-700 text-white' : 'bg-white'
-                    }`}
-                  />
+                  {(() => {
+                    // Gather currencies from all selected payment methods
+                    const selectedMethods = paymentMethods.filter(pm => pm.method).map(pm => findPaymentMethod(pm.method));
+                    const allCurrencies = selectedMethods.length > 0
+                      ? [...new Set(selectedMethods.flatMap(m => m?.currencies || []))].sort()
+                      : ['USD', 'EUR', 'GBP', 'KES', 'NGN', 'ZAR', 'INR', 'USDT', 'BTC'];
+                    return (
+                      <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent border-gray-300 dark:border-gray-600 ${
+                          darkMode ? 'bg-gray-700 text-white' : 'bg-white'
+                        }`}
+                      >
+                        <option value="">Select currency...</option>
+                        {allCurrencies.map(curr => (
+                          <option key={curr} value={curr}>{curr}</option>
+                        ))}
+                      </select>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -1512,7 +1615,11 @@ export default function P2PPaymentCoordinator() {
               {/* Generate Button */}
               <button
                 onClick={generateLink}
-                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed dark:disabled:bg-gray-600"
+                className={`w-full py-4 rounded-xl font-semibold transition disabled:bg-gray-300 disabled:cursor-not-allowed dark:disabled:bg-gray-600 ${
+                  darkMode 
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                    : 'bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-200'
+                }`}
               >
                 Generate Payment Link
               </button>
@@ -1556,13 +1663,17 @@ export default function P2PPaymentCoordinator() {
                     type="text"
                     value={generatedLink}
                     readOnly
-                    className={`flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg ${
-                      darkMode ? 'bg-gray-700 text-white' : 'bg-gray-50'
+                    className={`flex-1 px-4 py-3 border-2 rounded-xl ${
+                      darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-slate-50 border-slate-200'
                     }`}
                   />
                   <button
                     onClick={() => copyToClipboard()}
-                    className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2"
+                    className={`px-6 py-3 rounded-xl transition flex items-center gap-2 font-semibold ${
+                      darkMode 
+                        ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                        : 'bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-200'
+                    }`}
                   >
                     {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                     {copied ? 'Copied!' : 'Copy'}

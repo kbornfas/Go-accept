@@ -1,10 +1,43 @@
 {
   "wallet": {
     "balances": {
-      "USD": 15000,
+      "USD": 14550,
       "KES": 0
     },
     "activity": [
+      {
+        "id": "1764923704891-b22226542da1b",
+        "type": "hold",
+        "amount": 100,
+        "currency": "USD",
+        "description": "Hold created for bybit",
+        "timestamp": "2025-12-05T08:35:04.891Z"
+      },
+      {
+        "id": "1764922993527-e37e5982df86f8",
+        "type": "transfer",
+        "amount": 250,
+        "currency": "USD",
+        "description": "Transfer to external",
+        "timestamp": "2025-12-05T08:23:13.528Z"
+      },
+      {
+        "id": "1764922959432-c47bc23655a29",
+        "type": "release",
+        "amount": 100,
+        "currency": "USD",
+        "description": "Funds released for noones",
+        "timestamp": "2025-12-05T08:22:39.432Z",
+        "relatedEscrowId": "mislh11d-m135wy"
+      },
+      {
+        "id": "1764922811521-df0959da1f5bf8",
+        "type": "hold",
+        "amount": 100,
+        "currency": "USD",
+        "description": "Hold created for noones",
+        "timestamp": "2025-12-05T08:20:11.521Z"
+      },
       {
         "id": "1764919930175-b2cad28ec1ef38",
         "type": "deposit",
@@ -15,7 +48,130 @@
       }
     ]
   },
-  "escrows": [],
-  "history": [],
-  "notifications": []
+  "escrows": [
+    {
+      "id": "mism06d7-516ev3",
+      "platform": "bybit",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "mobile_money",
+          "fields": {
+            "provider": "Mpesa",
+            "phoneNumber": "+254704618663",
+            "accountName": "Bonface Kigen"
+          }
+        }
+      ],
+      "amount": 100,
+      "currency": "USD",
+      "notes": "",
+      "status": "held",
+      "expiresAt": "2025-12-05T08:50:04.884Z",
+      "createdAt": "2025-12-05T08:35:04.884Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY0OTIzNjYxLCJleHAiOjE3NjQ5NTI0NjF9.e4qRjVxE4v1_bLCnjdYX0Pv6r3HZGLTOrKVM9oBWxO0",
+      "statusHistory": [
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-05T08:35:04.891Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
+    {
+      "id": "mislh11d-m135wy",
+      "platform": "noones",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "mobile_money",
+          "fields": {
+            "provider": "Mpesa",
+            "phoneNumber": "+254704618663",
+            "accountName": "Bonface Kigen"
+          }
+        }
+      ],
+      "amount": 100,
+      "currency": "USD",
+      "notes": "",
+      "status": "released",
+      "expiresAt": "2025-12-05T08:35:11.508Z",
+      "createdAt": "2025-12-05T08:20:11.509Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY0OTIyNjg2LCJleHAiOjE3NjQ5NTE0ODZ9.3Fk9Wz_CI_8Kuvll18wnkaaVJX1hHJXOkEyRDWfr23Y",
+      "statusHistory": [
+        {
+          "status": "released",
+          "actor": "admin",
+          "timestamp": "2025-12-05T08:22:39.432Z",
+          "note": ""
+        },
+        {
+          "status": "approved",
+          "actor": "admin",
+          "timestamp": "2025-12-05T08:22:35.089Z",
+          "note": ""
+        },
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-05T08:20:11.521Z",
+          "note": "Funds reserved"
+        }
+      ]
+    }
+  ],
+  "history": [
+    {
+      "id": "1764923704891-bbfd76f69506d",
+      "escrowId": "mism06d7-516ev3",
+      "platform": "bybit",
+      "amount": 100,
+      "currency": "USD",
+      "createdAt": "2025-12-05T08:35:04.884Z"
+    },
+    {
+      "id": "1764922811521-aeae2751da0b4",
+      "escrowId": "mislh11d-m135wy",
+      "platform": "noones",
+      "amount": 100,
+      "currency": "USD",
+      "createdAt": "2025-12-05T08:20:11.509Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "1764923704891-b7ac1b7ce69e38",
+      "createdAt": "2025-12-05T08:35:04.891Z",
+      "target": "admin",
+      "escrowId": "mism06d7-516ev3",
+      "status": "held",
+      "message": "New escrow created for bybit"
+    },
+    {
+      "id": "1764922959432-e66a49f8b6c9c8",
+      "createdAt": "2025-12-05T08:22:39.432Z",
+      "target": "seller",
+      "escrowId": "mislh11d-m135wy",
+      "status": "released",
+      "message": "Escrow mislh11d-m135wy marked as released"
+    },
+    {
+      "id": "1764922955089-de4ae200b0946",
+      "createdAt": "2025-12-05T08:22:35.090Z",
+      "target": "seller",
+      "escrowId": "mislh11d-m135wy",
+      "status": "approved",
+      "message": "Escrow mislh11d-m135wy marked as approved"
+    },
+    {
+      "id": "1764922811521-011b9ee179b118",
+      "createdAt": "2025-12-05T08:20:11.522Z",
+      "target": "admin",
+      "escrowId": "mislh11d-m135wy",
+      "status": "held",
+      "message": "New escrow created for noones"
+    }
+  ]
 }
