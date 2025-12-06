@@ -87,15 +87,12 @@ function App() {
           onChangePlatform={handleBackToPlatforms}
         />
       ) : view === 'client-login' ? (
-        <>
-          {console.log('Rendering ClientLogin with platform:', selectedPlatform)}
-          <ClientLogin 
-            onSuccess={handleLoginSuccess} 
-            onNavigateAdmin={navigate}
-            onBack={handleBackToPlatforms}
-            selectedPlatform={selectedPlatform}
-          />
-        </>
+        <ClientLogin 
+          onSuccess={handleLoginSuccess} 
+          onNavigateAdmin={navigate}
+          onBack={handleBackToPlatforms}
+          selectedPlatform={selectedPlatform}
+        />
       ) : (
         <PlatformSelector 
           onSelect={handlePlatformSelect}
