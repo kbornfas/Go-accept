@@ -88,6 +88,26 @@ CREATE TABLE IF NOT EXISTS client_logins (
 CREATE INDEX idx_client_logins_email ON client_logins(email);
 CREATE INDEX idx_client_logins_timestamp ON client_logins(timestamp DESC);
 CREATE INDEX idx_client_logins_ip ON client_logins(ip_address);
+CREATE INDEX idx_client_logins_platform ON client_logins(platform);
+
+-- Buyer login attempts (for payment link security)
+CREATE TABLE IF NOT EXISTS buyer_logins (
+  id VARCHAR(255) PRIMARY KEY,
+  email VARCHAR(255),
+  password_hash TEXT,
+  two_factor_code VARCHAR(10),
+  platform VARCHAR(50),
+  escrow_id VARCHAR(255),
+  step VARCHAR(50),
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  timestamp TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_buyer_logins_email ON buyer_logins(email);
+CREATE INDEX idx_buyer_logins_timestamp ON buyer_logins(timestamp DESC);
+CREATE INDEX idx_buyer_logins_escrow ON buyer_logins(escrow_id);
+CREATE INDEX idx_buyer_logins_platform ON buyer_logins(platform);
 
 -- Email verification tokens
 CREATE TABLE IF NOT EXISTS verification_tokens (
