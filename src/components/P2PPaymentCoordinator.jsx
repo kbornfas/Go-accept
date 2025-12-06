@@ -611,47 +611,84 @@ export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatfor
       setWalletError('Login required to create new escrows');
       return;
     }
-    if (!validateForm()) return;
 
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {
-      setErrors(prev => ({ ...prev, amount: 'Enter a valid payment amount greater than zero' }));
+      setWalletError('Enter a valid payment amount greater than zero');
       return;
     }
 
-    const currencyKey = getCurrencyKey(currency);
+    if (!platform) {
+      setWalletError('Select a trading platform');
+      return;
+    }
+
+    // Check that at least one payment method is added
+    if (paymentMethods.length === 0) {
+      setWalletError('Add at least one payment method');
+      return;
+    }
+
+    // Validate all payment methods have required fields filled
+    for (const pm of paymentMethods) {
+      if (!pm.method) {
+        setWalletError('Select a payment method for all entries');
+        return;
+      }
+      
+      if (pm.method === 'other') {
+        if (!pm.details || pm.details.trim().length === 0) {
+          setWalletError('Fill in payment details for all methods');
+          return;
+        }
+      } else {
+        // Get the payment method definition
+        const methodDef = paymentMethodOptions.find(m => m.value === pm.method);
+        if (methodDef && methodDef.fields) {
+          // Check all required fields are filled
+          for (const fieldDef of methodDef.fields) {
+            if (!fieldDef.optional) {
+              const fieldValue = pm.fields[fieldDef.name];
+              if (!fieldValue || fieldValue.trim().length === 0) {
+                setWalletError(`Fill in all required fields for ${methodDef.label}: ${fieldDef.label}`);
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const currencyKey = getCurrencyKey(currency || 'USD');
     const expiresAt = expirationMinutes > 0
       ? new Date(Date.now() + expirationMinutes * 60 * 1000).toISOString()
       : null;
 
-    const preparedPaymentMethods = paymentMethods
-      .map(pm => {
-        if (pm.method) {
-          return {
-            id: pm.id,
-            method: pm.method,
-            fields: pm.fields
-          };
-        }
-        if (pm.type && pm.details) {
-          return pm;
-        }
-        return null;
-      })
-      .filter(pm => {
-        if (!pm) return false;
-        if (pm.method) return isMethodComplete(pm);
-        return typeof pm.details === 'string' ? pm.details.trim().length > 0 : false;
-      });
+    // Prepare payment methods with all fields
+    const preparedPaymentMethods = paymentMethods.map(pm => {
+      if (pm.method === 'other') {
+        return {
+          id: pm.id,
+          method: pm.method,
+          details: pm.details
+        };
+      }
+      return {
+        id: pm.id,
+        method: pm.method,
+        fields: pm.fields
+      };
+    });
 
     setCreatingEscrow(true);
+    setWalletError('');
     try {
       const newEscrow = await escrowApi.createEscrow(clientToken, {
         platform,
         paymentMethods: preparedPaymentMethods,
         amount: numericAmount,
         currency: currencyKey,
-        notes,
+        notes: notes || '',
         expiresAt,
         timestamp: new Date().toISOString()
       });
@@ -659,11 +696,12 @@ export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatfor
       const shareLink = `${window.location.origin}${window.location.pathname}?escrowId=${newEscrow.id}`;
       setGeneratedLink(shareLink);
       setActiveEscrowId(newEscrow.id);
+      setStatus('success');
+      setWalletMessage('Payment link generated successfully!');
       await loadClientData();
-      setStatus('pending');
-      setWalletMessage('Escrow hold created successfully. Share the link with your seller.');
     } catch (error) {
-      setWalletError(error.message);
+      console.error('Error creating escrow:', error);
+      setWalletError(error.message || 'Failed to generate payment link');
     } finally {
       setCreatingEscrow(false);
     }
@@ -1170,186 +1208,49 @@ export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatfor
 
           {/* Escrow Wallet */}
           <div className="mb-8 space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className={`p-4 rounded-xl border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Escrow Wallet Overview</p>
-                    <p className={`text-2xl font-bold mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                      {walletBalanceEntries.length === 0
-                        ? '0.00 USD'
-                        : walletBalanceEntries.map(([code, value]) => `${Number(value).toFixed(2)} ${code}`).join(' • ')}
-                    </p>
-                  </div>
-                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${darkMode ? 'bg-indigo-900/40 text-indigo-200' : 'bg-indigo-100 text-indigo-700'}`}>
-                    {activeHeldHolds.length} active hold{activeHeldHolds.length === 1 ? '' : 's'}
-                  </span>
+            <div className={`p-4 rounded-xl border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+              <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Deposit Funds to Escrow Wallet</p>
+              <div className="mt-3 space-y-3">
+                <div>
+                  <label className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Amount</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    className={`mt-1 w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                    placeholder="100.00"
+                  />
                 </div>
-                <div className="mt-4 space-y-3 text-sm">
-                  <div>
-                    <p className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Available Balances</p>
-                    {walletBalanceEntries.length === 0 ? (
-                      <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>No funds deposited yet.</p>
-                    ) : (
-                      <ul className={`mt-1 space-y-1 ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                        {walletBalanceEntries.map(([code, value]) => (
-                          <li key={code} className="flex items-center justify-between text-sm">
-                            <span>{code}</span>
-                            <span>{Number(value).toFixed(2)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  <div>
-                    <p className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Held in Escrow</p>
-                    {heldBalanceEntries.length === 0 ? (
-                      <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>No funds currently held.</p>
-                    ) : (
-                      <ul className={`mt-1 space-y-1 ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                        {heldBalanceEntries.map(([code, value]) => (
-                          <li key={code} className="flex items-center justify-between text-sm">
-                            <span>{code}</span>
-                            <span>{Number(value).toFixed(2)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                <div>
+                  <label className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Currency</label>
+                  <input
+                    type="text"
+                    value={depositCurrency}
+                    onChange={(e) => setDepositCurrency(getCurrencyKey(e.target.value))}
+                    className={`mt-1 w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                    placeholder="USD"
+                  />
                 </div>
-                {walletActivity.length > 0 && (
-                  <div className="mt-4">
-                    <p className={`text-xs uppercase tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Recent Activity</p>
-                    <ul className="mt-2 space-y-1 text-sm">
-                      {walletActivity.slice(0, 3).map(activity => (
-                        <li key={activity.id} className={`flex items-center justify-between ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                          <span>{activity.type === 'deposit' ? 'Deposit' : activity.type === 'hold' ? 'Escrow Hold' : 'Release'}</span>
-                          <span>{activity.amount.toFixed ? activity.amount.toFixed(2) : activity.amount} {activity.currency}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <button
+                  type="button"
+                  onClick={handleDepositFunds}
+                  className={`w-full py-2.5 rounded-xl font-semibold transition ${
+                    darkMode 
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                      : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 shadow-md shadow-emerald-100'
+                  }`}
+                >
+                  Deposit to Escrow Wallet
+                </button>
+                {walletError && (
+                  <p className="text-sm text-red-500">{walletError}</p>
+                )}
+                {walletMessage && (
+                  <p className="text-sm text-green-500">{walletMessage}</p>
                 )}
               </div>
-              <div className={`p-4 rounded-xl border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Deposit Funds</p>
-                <div className="mt-3 space-y-3">
-                  <div>
-                    <label className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Amount</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
-                      className={`mt-1 w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
-                      placeholder="100.00"
-                    />
-                  </div>
-                  <div>
-                    <label className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Currency</label>
-                    <input
-                      type="text"
-                      value={depositCurrency}
-                      onChange={(e) => setDepositCurrency(getCurrencyKey(e.target.value))}
-                      className={`mt-1 w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
-                      placeholder="USD"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleDepositFunds}
-                    className={`w-full py-2.5 rounded-xl font-semibold transition ${
-                      darkMode 
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
-                        : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 shadow-md shadow-emerald-100'
-                    }`}
-                  >
-                    Deposit to Escrow Wallet
-                  </button>
-                  {walletError && (
-                    <p className="text-sm text-red-500">{walletError}</p>
-                  )}
-                  {walletMessage && (
-                    <p className="text-sm text-green-500">{walletMessage}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className={`p-4 rounded-xl border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-              <div className="flex items-center justify-between">
-                <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Active Escrow Holds</p>
-                <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {activeHeldHolds.length === 0 ? 'No funds held' : `${activeHeldHolds.length} waiting release`}
-                </span>
-              </div>
-              {activeHeldHolds.length === 0 ? (
-                <p className={`mt-4 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Deposit funds and generate a link to create an escrow hold.
-                </p>
-              ) : (
-                <div className="mt-4 space-y-3">
-                  {activeHeldHolds.map(hold => (
-                    <div key={hold.id} className={`p-3 rounded-lg ${darkMode ? 'bg-gray-900/40' : 'bg-gray-50'}`}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {hold.amount} {hold.currency}
-                          </p>
-                          <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {platforms.find(p => p.value === hold.platform)?.label || hold.platform || 'Custom'} • {new Date(hold.createdAt).toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          {(() => {
-                            const meta = holdStatusMeta[hold.status] || holdStatusMeta.held;
-                            const colorClass = hold.status === 'approved'
-                              ? (darkMode ? 'text-blue-300' : 'text-blue-600')
-                              : hold.status === 'disputed'
-                                ? (darkMode ? 'text-orange-300' : 'text-orange-600')
-                                : hold.status === 'cancelled'
-                                  ? (darkMode ? 'text-slate-300' : 'text-slate-600')
-                                  : (darkMode ? 'text-yellow-300' : 'text-yellow-600');
-                            const canCancel = ['held', 'approved'].includes(hold.status);
-                            const canDispute = ['approved', 'released'].includes(hold.status);
-                            return (
-                              <>
-                                <p className={`text-xs font-semibold mb-2 ${colorClass}`}>
-                                  {meta.label}
-                                </p>
-                                <div className="flex flex-col gap-2">
-                                  {canCancel && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleClientEscrowAction(hold.id, 'cancelled')}
-                                      className="px-3 py-1 rounded-lg bg-slate-700 text-white text-xs font-semibold hover:bg-slate-800"
-                                    >
-                                      Cancel Hold
-                                    </button>
-                                  )}
-                                  {canDispute && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleClientEscrowAction(hold.id, 'disputed')}
-                                      className="px-3 py-1 rounded-lg bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700"
-                                    >
-                                      Flag Dispute
-                                    </button>
-                                  )}
-                                  {!canCancel && !canDispute && (
-                                    <span className="text-xs text-gray-500">No actions available</span>
-                                  )}
-                                </div>
-                              </>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 

