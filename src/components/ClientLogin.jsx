@@ -197,10 +197,10 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
   const theme = getPlatformTheme()
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 transition-colors relative overflow-hidden" style={{ background: theme.background }}>
+    <div className="min-h-screen flex items-center justify-center p-6 transition-colors relative overflow-hidden" style={{ backgroundColor: '#000' }}>
       {/* Animated background elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-10 blur-3xl" style={{ backgroundColor: platformColor }} />
-      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-10 blur-3xl" style={{ backgroundColor: platformColor }} />
+      <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ backgroundColor: '#000' }} />
+      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ backgroundColor: '#000' }} />
       
       {onBack && (
         <button
