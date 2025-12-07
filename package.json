@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server/index.js",
+    "postinstall": "test -f .env || cp .env.example .env",
     "server": "node server/index.js",
     "server:dev": "NODE_ENV=development node server/index.js",
     "server:prod": "NODE_ENV=production node server/index.js",
