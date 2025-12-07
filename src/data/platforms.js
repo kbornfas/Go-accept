@@ -3,7 +3,7 @@ export const platforms = [
     value: 'noones',
     label: 'Noones',
     url: 'https://noones.com',
-    logo: 'https://noones.com/favicon.ico',
+    logo: 'https://noones.com/static/media/noones-logo.svg',
     color: '#00C853',
     description: 'Buy and sell Bitcoin with 400+ payment methods'
   },
