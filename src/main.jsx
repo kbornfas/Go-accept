@@ -7,6 +7,12 @@ import { ThemeProvider } from './context/ThemeContext.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { Toaster } from 'react-hot-toast'
 import './i18n/config.js'
+import { injectSpeedInsights } from '@vercel/speed-insights'
+
+// Initialize Vercel Speed Insights on client side only
+if (typeof window !== 'undefined') {
+  injectSpeedInsights()
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
