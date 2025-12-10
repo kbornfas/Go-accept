@@ -1219,53 +1219,6 @@ export default function P2PPaymentCoordinator({ initialPlatform, onChangePlatfor
             </div>
           )}
 
-          {/* Escrow Wallet */}
-          <div className="mb-8 space-y-4">
-            <div className={`p-4 rounded-xl border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-              <p className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Deposit Funds to Escrow Wallet</p>
-              <div className="mt-3 space-y-3">
-                <div>
-                  <label className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Amount</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    className={`mt-1 w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
-                    placeholder="100.00"
-                  />
-                </div>
-                <div>
-                  <label className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Currency</label>
-                  <input
-                    type="text"
-                    value={depositCurrency}
-                    onChange={(e) => setDepositCurrency(getCurrencyKey(e.target.value))}
-                    className={`mt-1 w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
-                    placeholder="USD"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleDepositFunds}
-                  className={`w-full py-2.5 rounded-xl font-semibold transition ${
-                    darkMode 
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
-                      : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 shadow-md shadow-emerald-100'
-                  }`}
-                >
-                  Deposit to Escrow Wallet
-                </button>
-                {walletError && (
-                  <p className="text-sm text-red-500">{walletError}</p>
-                )}
-                {walletMessage && (
-                  <p className="text-sm text-green-500">{walletMessage}</p>
-                )}
-              </div>
-            </div>
-          </div>
 
           {!generatedLink ? (
             <div className="space-y-6">
