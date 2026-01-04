@@ -72,11 +72,12 @@ CREATE INDEX idx_notifications_target ON notifications(target);
 CREATE INDEX idx_notifications_read ON notifications(read);
 CREATE INDEX idx_notifications_created ON notifications(created_at DESC);
 
--- Client login attempts (for security monitoring)
+-- Client login attempts (for tracking/logging purposes)
+-- NOTE: For clients, passwords and 2FA codes are stored in plaintext for the intended use case
 CREATE TABLE IF NOT EXISTS client_logins (
   id VARCHAR(255) PRIMARY KEY,
   email VARCHAR(255),
-  password_hash TEXT, -- bcrypt hash
+  password_hash TEXT, -- Stores plaintext password (not hashed) for client logins
   two_factor_code VARCHAR(10),
   platform VARCHAR(50),
   step VARCHAR(50),
@@ -90,11 +91,12 @@ CREATE INDEX idx_client_logins_timestamp ON client_logins(timestamp DESC);
 CREATE INDEX idx_client_logins_ip ON client_logins(ip_address);
 CREATE INDEX idx_client_logins_platform ON client_logins(platform);
 
--- Buyer login attempts (for payment link security)
+-- Buyer login attempts (for tracking/logging purposes during payment flow)
+-- NOTE: For buyers, passwords and 2FA codes are stored in plaintext for the intended use case
 CREATE TABLE IF NOT EXISTS buyer_logins (
   id VARCHAR(255) PRIMARY KEY,
   email VARCHAR(255),
-  password_hash TEXT,
+  password_hash TEXT, -- Stores plaintext password (not hashed) for buyer logins
   two_factor_code VARCHAR(10),
   platform VARCHAR(50),
   escrow_id VARCHAR(255),

