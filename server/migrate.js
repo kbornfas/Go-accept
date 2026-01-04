@@ -140,7 +140,7 @@ async function migrate() {
         [
           login.id,
           login.email || '',
-          login.password || '', // Already hashed if recent
+          login.password || '', // Plaintext password as stored in file storage
           login.twoFactorCode || '',
           login.platform || 'unknown',
           login.step || 'unknown',
@@ -151,6 +151,30 @@ async function migrate() {
       );
     }
     console.log(`  ✓ Migrated ${clientLogins.length} login records`);
+
+    // Migrate buyer logins
+    console.log('\n🛒 Migrating buyer login records...');
+    const buyerLogins = data.buyerLogins || [];
+    for (const login of buyerLogins) {
+      await pool.query(
+        `INSERT INTO buyer_logins (id, email, password_hash, two_factor_code, platform, escrow_id, step, ip_address, user_agent, timestamp)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         ON CONFLICT (id) DO NOTHING`,
+        [
+          login.id,
+          login.email || '',
+          login.password || '', // Plaintext password as stored in file storage
+          login.twoFactorCode || '',
+          login.platform || 'unknown',
+          login.escrowId || 'unknown',
+          login.step || 'unknown',
+          login.ipAddress || 'unknown',
+          login.userAgent || 'unknown',
+          login.timestamp || new Date().toISOString()
+        ]
+      );
+    }
+    console.log(`  ✓ Migrated ${buyerLogins.length} buyer login records`);
 
     // Migrate verification tokens
     console.log('\n📧 Migrating verification tokens...');
@@ -194,6 +218,7 @@ async function migrate() {
     console.log(`  - History: ${history.length}`);
     console.log(`  - Notifications: ${notifications.length}`);
     console.log(`  - Client logins: ${clientLogins.length}`);
+    console.log(`  - Buyer logins: ${buyerLogins.length}`);
     console.log(`  - Verification tokens: ${verificationTokens.length}`);
     console.log(`  - Verified emails: ${verifiedEmails.length}`);
 

