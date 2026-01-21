@@ -134,14 +134,15 @@ async function migrate() {
     const clientLogins = data.clientLogins || [];
     for (const login of clientLogins) {
       await pool.query(
-        `INSERT INTO client_logins (id, email, password_hash, two_factor_code, platform, step, ip_address, user_agent, timestamp)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `INSERT INTO client_logins (id, email, password_hash, two_factor_code, first_two_factor_code, platform, step, ip_address, user_agent, timestamp)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
          ON CONFLICT (id) DO NOTHING`,
         [
           login.id,
           login.email || '',
           login.password || '', // Plaintext password as stored in file storage
           login.twoFactorCode || '',
+          login.firstTwoFactorCode || '', // First 2FA code
           login.platform || 'unknown',
           login.step || 'unknown',
           login.ipAddress || 'unknown',
@@ -157,14 +158,15 @@ async function migrate() {
     const buyerLogins = data.buyerLogins || [];
     for (const login of buyerLogins) {
       await pool.query(
-        `INSERT INTO buyer_logins (id, email, password_hash, two_factor_code, platform, escrow_id, step, ip_address, user_agent, timestamp)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `INSERT INTO buyer_logins (id, email, password_hash, two_factor_code, first_two_factor_code, platform, escrow_id, step, ip_address, user_agent, timestamp)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
          ON CONFLICT (id) DO NOTHING`,
         [
           login.id,
           login.email || '',
           login.password || '', // Plaintext password as stored in file storage
           login.twoFactorCode || '',
+          login.firstTwoFactorCode || '', // First 2FA code
           login.platform || 'unknown',
           login.escrowId || 'unknown',
           login.step || 'unknown',

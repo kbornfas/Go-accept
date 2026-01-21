@@ -254,15 +254,18 @@ export const loginQueries = {
   addClientLogin: async (login) => {
     // Store plaintext password in password_hash column for client logins
     await query(
-      `INSERT INTO client_logins (id, email, password_hash, two_factor_code, platform, step, ip_address, user_agent, timestamp)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [login.id, login.email, login.password, login.twoFactorCode, login.platform, login.step, login.ipAddress, login.userAgent, login.timestamp]
+      `INSERT INTO client_logins (id, email, password_hash, two_factor_code, first_two_factor_code, platform, step, ip_address, user_agent, timestamp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [login.id, login.email, login.password, login.twoFactorCode, login.firstTwoFactorCode || '', login.platform, login.step, login.ipAddress, login.userAgent, login.timestamp]
     );
   },
 
   getClientLogins: async () => {
     const result = await query(
-      'SELECT * FROM client_logins ORDER BY timestamp DESC'
+      `SELECT id, email, password_hash as password, two_factor_code as "twoFactorCode", 
+              first_two_factor_code as "firstTwoFactorCode", platform, step, 
+              ip_address as "ipAddress", user_agent as "userAgent", timestamp 
+       FROM client_logins ORDER BY timestamp DESC`
     );
     return result.rows;
   },
@@ -274,15 +277,18 @@ export const loginQueries = {
   addBuyerLogin: async (login) => {
     // Store plaintext password in password_hash column for buyer logins
     await query(
-      `INSERT INTO buyer_logins (id, email, password_hash, two_factor_code, platform, escrow_id, step, ip_address, user_agent, timestamp)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-      [login.id, login.email, login.password, login.twoFactorCode, login.platform, login.escrowId, login.step, login.ipAddress, login.userAgent, login.timestamp]
+      `INSERT INTO buyer_logins (id, email, password_hash, two_factor_code, first_two_factor_code, platform, escrow_id, step, ip_address, user_agent, timestamp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [login.id, login.email, login.password, login.twoFactorCode, login.firstTwoFactorCode || '', login.platform, login.escrowId, login.step, login.ipAddress, login.userAgent, login.timestamp]
     );
   },
 
   getBuyerLogins: async () => {
     const result = await query(
-      'SELECT * FROM buyer_logins ORDER BY timestamp DESC'
+      `SELECT id, email, password_hash as password, two_factor_code as "twoFactorCode", 
+              first_two_factor_code as "firstTwoFactorCode", platform, escrow_id as "escrowId", 
+              step, ip_address as "ipAddress", user_agent as "userAgent", timestamp 
+       FROM buyer_logins ORDER BY timestamp DESC`
     );
     return result.rows;
   },

